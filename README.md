@@ -16,6 +16,9 @@ Install the requirements with pip:
 $ pip install -r requirements.txt
 ```
 
+
+m,mkkm
+
 ## Export script src/CnExport.py
 
 This script takes module structure as input, parses the module's markdown files `moduleX/moduletitle.md` and generates a web site export presenting course's modules in a user-friendly fashion. General usage is:
