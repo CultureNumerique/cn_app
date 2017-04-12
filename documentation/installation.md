@@ -152,6 +152,7 @@ L'idée ici est d'ajouter un site à la config Apache. Pour ceci créer un fichi
 
         <Directory /path/to/cnapp_install/data/repo-data>
         Require all granted
+        </Directory>
 
         # URL et chemin pour les fichiers static de Django
         Alias /static /path/to/cnapp_install/cn_app/collectedstatics
