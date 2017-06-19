@@ -1,0 +1,100 @@
+
+<!-- Page for dealing with a course -->
+
+{% extends "app.html" %}
+
+{% if userFound %}
+  <p> Partage du projet effectué avec succès ! </p>
+{% endif %}
+
+{% block content %}
+
+  {% if user.is_authenticated %}
+
+    <h2>{{ cours.nom_cours }}</h2>
+
+    <!-- General informations about the course -->
+    <fieldset id="home">
+      <legend>Infos du cours</legend>
+
+      <h5>Contributeurs</h5>
+      <ul>
+      {% for profil in cours.profil_set.all %}
+          <li>{{ profil.user.username }}</li>
+      {% endfor %}
+      </ul>
+
+      <h5>Plan du cours</h5>
+      <table>
+        <tr>
+          <th>{{ cours.nb_module }} Module(s) </th>
+          <th>Modification</th>
+          <th>Suppression</th>
+        </tr>
+        <tr>
+          <td>Home : </td>
+          <td><a href="{% url 'cours_edition' cours.id_cours cours.url_home %}">Voir le home</a></td>
+          {% for module in cours.module_set.all %}
+          <tr>
+            <td>Module : {{ module.nom_module }} </td>
+            <td><a href="{% url 'cours_edition' cours.id_cours module.url %}">Voir le module</a></td>
+            <td><a href="{% url 'delete_module' cours.id_cours module.url %}">Supprimer</a></td>
+          </tr>
+
+          {% endfor %}
+
+        </tr>
+      </table>
+      <a href='/cours'><button>Retour à mes cours</button></a>
+
+    </fieldset>
+
+    <!-- Form for creating a new module -->
+    <form action="{% url 'cours' cours.id_cours %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset id="home">
+          <legend>Créer un nouveau module</legend>
+          <table><tr>
+            <td>{{ form_new_module.as_p}}</td>
+            <td><input type="submit" value="Créer un module" /></td>
+          </tr></table>
+        </fieldset>
+        <input type="hidden" name="id_form" value="0">
+    </form>
+
+
+    <!-- Form for sharing the course to other users -->
+    <form action="{% url 'cours' cours.id_cours %}" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+      <fieldset id="partage">
+        <legend>Partager le cours</legend>
+        <table><tr>
+          <td>{{ form_add_user.as_p}} </td>
+          <td><input type="submit" value="Partager"/></td>
+        </tr></table>
+      </fieldset>
+      <input type="hidden" name="id_form" value="1">
+
+    </form>
+
+    <!-- Form for generating the course into an archive -->
+    <form action="{% url 'cours' cours.id_cours %}" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <fieldset id="home">
+        <legend>Génération du cours</legend>
+        {{ form_generate.as_p}}
+      </fieldset>
+      <input type="submit" value="Générer l'archive" />
+      <input type="hidden" name="id_form" value="2">
+    </form>
+
+    <br>
+
+    <a href="{% url 'mes_cours' %}"><button>Retour à mes cours</button></a>
+
+  {% else %}
+  <p> Vous n'êtes pas censé avoir accès à cette page, veuillez vous connecter !</p>
+  {% endif %}
+
+{% endblock %}

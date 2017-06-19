@@ -1,23 +1,20 @@
-from __future__ import division
 # -*- coding: utf-8 -*-
 #!cnappenv/bin/python
+from __future__ import division
 
 
 import os
+import sys
 import shutil
-import tarfile
 import requests
 import markdown
 
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime
 from io import open
-from lxml import etree
-from lxml import html
 from urlparse import urlparse
 from slugify import slugify
 
-import model
 import logging
 
 MARKDOWN_EXT = ['markdown.extensions.extra', 'superscript']
@@ -26,7 +23,7 @@ FOLDERS = ['Comprehension', 'Activite', 'ActiviteAvancee', 'webcontent']
 STATIC_FOLDERS = ['static/js', 'static/img', 'static/svg', 'static/css', 'static/fonts']
 VERBOSITY = False
 DEFAULT_VIDEO_THUMB_URL = 'https://i.vimeocdn.com/video/536038298_640.jpg'
-
+VIDEO_THUMB_API_URL = 'http://vimeo.com/api/v2/video/'
 
 def fetch_vimeo_thumb(video_link):
     """ fetch video thumbnail for vimeo videos """
@@ -62,6 +59,7 @@ def get_embed_code_for_url(url):
             # return hostname, res['html']
         vid_id = url.strip('/').rsplit('/', 1)[1]
         embed_code = """<iframe src="https://player.vimeo.com/video/{0}" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>""".format(vid_id)
+        # FIXME : problème avec W3validator avec webkitallowfullscreen mozallowfullscreen allowfullscreen
         return hostname, embed_code
 
     # CanalU.tv
@@ -72,6 +70,7 @@ def get_embed_code_for_url(url):
 
     # not supported
     else:
+        # FIXME : Ajouter un warning ici
         return hostname, '<p>Unsupported video provider ({0})</p>'.format(hostname)
 
 
@@ -82,7 +81,7 @@ def get_video_src(video_link):
     soup = BeautifulSoup(embed, 'html.parser')
     try:
         src_link = soup.iframe['src']
-    except Exception as e:
+    except Exception:
         src_link = ''
     return src_link
 
@@ -95,7 +94,7 @@ def add_target_blank(html_src):
         anchor['target'] = "_blank"
     return soup.prettify()
 
-
+# FIXME: it is usefull ?
 def iframize_video_anchors(htmlsrc, anchor_class):
     """ given a piece of html code, scan for video anchors
         filtered by given class and add corresponding video iframe code before each anchor
@@ -118,10 +117,10 @@ def iframize_video_anchors(htmlsrc, anchor_class):
     return output.replace('class_', 'class')
 
 
-def totimestamp(dt, epoch=datetime(1970,1,1)):
-    td = dt - epoch
-    # return td.total_seconds()
-    return (td.microseconds + (td.seconds + td.days * 86400) * 10**6) / 10**6
+# def totimestamp(dt, epoch=datetime(1970,1,1)):
+#     td = dt - epoch
+#     # return td.total_seconds()
+#     return (td.microseconds + (td.seconds + td.days * 86400) * 10**6) / 10**6
 
 
 #FIXME: make it simpler with no current_dir param, but only target_folder
@@ -144,13 +143,13 @@ def write_file(src, current_dir, target_folder, name):
     return filename
 
 
-def stitch_files(files, filename):
-    """ concatenate "files" and save it as "filename" """
-    with open(filename, "w", encoding='utf-8') as outfile:
-        for f in files:
-            with open(f, "r", encoding='utf-8') as infile:
-                outfile.write(infile.read())
-    return outfile
+# def stitch_files(files, filename):
+#     """ concatenate "files" and save it as "filename" """
+#     with open(filename, "w", encoding='utf-8') as outfile:
+#         for f in files:
+#             with open(f, "r", encoding='utf-8') as infile:
+#                 outfile.write(infile.read())
+#     return outfile
 
 
 def createDirs(outDir, folders):
@@ -172,7 +171,7 @@ def copyMediaDir(repoDir, moduleOutDir, module):
     if os.path.isdir(mediaDir):
         try :
             shutil.copytree(mediaDir, os.path.join(moduleOutDir,'media'))
-        except OSError as exception:
+        except OSError:
             logging.warn("%s already exists. Going to delete it",mediaDir)
             shutil.rmtree(os.path.join(moduleOutDir,'media'))
             shutil.copytree(mediaDir, os.path.join(moduleOutDir,'media'))
@@ -206,7 +205,7 @@ def prepareDestination(BASE_PATH, outDir):
         dest = os.path.join(outDir, d)
         try :
             shutil.copytree(source, dest)
-        except OSError as e:
+        except OSError:
             logging.warn("%s already exists, going to overwrite it",d)
             shutil.rmtree(dest)
             shutil.copytree(source, dest)

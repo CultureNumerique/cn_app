@@ -1,22 +1,15 @@
 #!cnappenv/bin/python
 # -*- coding: utf-8 -*-
 import argparse
-import json
 import os
 import sys
 import logging
 import shutil
 import glob
-import tarfile
 
-from lxml import etree
-from lxml import html
 import markdown
-from yattag import indent
-from yattag import Doc
-from lxml.html.clean import Cleaner
 from io import open
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 
 import utils
 import toIMS
@@ -30,6 +23,8 @@ TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates' )
 LOGFILE = 'logs/cnExport.log'
 
 def writeHtml(module, outModuleDir, html):
+    """
+    """
     module_file_name = os.path.join(outModuleDir, module)+'.html'
     moduleHtml = open(module_file_name, 'w', encoding='utf-8')
     moduleHtml.write(html)
@@ -53,13 +48,12 @@ def processModule(args, repoDir, outDir, module):
     # write html, XML, and JSon files
     utils.write_file(m.toGift(), moduleOutDir, '', module+'.questions_bank.gift.txt')
     utils.write_file(m.toVideoList(), moduleOutDir, '', module+'.video_iframe_list.txt')
-    mod_config = utils.write_file(m.toJson(), moduleOutDir, '',  module+'.config.json') # FIXME : this file should be optionnaly written
 
     # EDX files
     if args.edx:
         m.edx_archive_path = toEDX.generateEDXArchive(m, moduleOutDir)
 
-    # if chosen, generate IMS archive
+    # # if chosen, generate IMS archive
     if args.ims:
         m.ims_archive_path = toIMS.generateImsArchive(m, module, moduleOutDir)
         logging.warn('*Path to IMS = %s*' % m.ims_archive_path)
@@ -119,7 +113,7 @@ def buildSite(course_obj, repoDir, outDir):
             home_data = f.read()
         home_html = markdown.markdown(home_data, MARKDOWN_EXT)
         custom_home = True
-    except Exception as err:
+    except Exception:
         ## use default from template
         logging.error(" Cannot parse home markdown ")
         with open(os.path.join(TEMPLATES_PATH, 'default_home.html'), 'r', encoding='utf-8') as f:
@@ -161,6 +155,7 @@ if __name__ == "__main__":
     # ** Logging **
     logfile = utils.create_empty_file(os.path.join(BASE_PATH, 'logs'), 'cnExport.log')
     logging.basicConfig(filename=logfile,filemode='w',level=getattr(logging, args.logLevel))
+    # FIXME : PACKAGE LOGGING POUR LA GESTION D'ERREUR !
 
     # ** Paths and directories **
     if os.path.isabs(args.repository):

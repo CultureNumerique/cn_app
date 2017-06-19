@@ -18,7 +18,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('/home/presidence/flimpens/src/cn_app/src'))
+sys.path.insert(0, os.path.abspath('/path/to/cn_app/src/cn_app/src'))
 
 # -- General configuration ------------------------------------------------
 

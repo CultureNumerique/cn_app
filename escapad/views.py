@@ -13,6 +13,8 @@ import zipfile
 
 import shutil
 
+import forms
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, JsonResponse
@@ -25,6 +27,9 @@ from .models import Repository
 from .utils import run_shell_command
 logger = logging.getLogger(__name__)
 
+from src import model
+from src import utils
+import markdown
 
 class BuildView(View):
     """

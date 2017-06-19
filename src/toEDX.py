@@ -19,6 +19,11 @@ from jinja2 import Template, Environment, FileSystemLoader
 
 import utils
 import model
+import fromGift
+import re
+import StringIO
+from tarfile import TarFile
+
 
 
 MARKDOWN_EXT = ['markdown.extensions.extra', 'superscript']
@@ -46,9 +51,7 @@ def loadJinjaEnv():
 
 def toEdxProblemXml(question):
     """ given a question object, return EDX Xml """
-    jenv = loadJinjaEnv()
-    problem_template = jenv.get_template("edx_problem_template.xml")
-    return problem_template.render(q=question)
+    return question.toEDX()
 
 
 def generateEDXArchive(module, moduleOutDir):
@@ -85,6 +88,7 @@ def generateEDXArchive(module, moduleOutDir):
         pjson = json.dumps(json.loads(pjson),ensure_ascii=True,indent=4,separators=(',', ': '))
         utils.write_file(pjson, os.getcwd(), os.path.join(edx_outdir, 'policies', 'course'), pfile)
 
+
     # Write main course.xml file
     course_template = jenv.get_template("course.tmpl.xml")
     course_xml = course_template.render(module=module, grademap=EDX_GRADER_MAP)
@@ -98,3 +102,81 @@ def generateEDXArchive(module, moduleOutDir):
     tar.close()
 
     return ('%s_edx.tar.gz' % module.module)
+
+
+def generateEDXArchiveLight(module, moduleOutDir, zipFile):
+    """ Given a module object and destination dir, generate EDX archive """
+
+    # Module data
+    module.advanced_EDX_module_list = EDX_ADVANCED_MODULE_LIST.__str__()
+
+    edx_outdir = os.path.join(moduleOutDir, 'EDX')
+
+    # generate content files: html/webcontent | problem/(Activite|ActiviteAvancee|Comprehension)
+    for sec in module.sections:
+        for sub in sec.subsections:
+            if sub.folder == 'webcontent': # these go to EDX/html/
+                html_outdir = os.path.join(edx_outdir, 'html', sub.getFilename())
+                zipFile.writestr(html_outdir, sub.html_src.encode("UTF-8"))
+                #zipFile.writestr(module.module+'/EDX/html/'+sub.getFilename(), sub.html_src.encode("UTF-8"))
+            elif sub.folder in ('Activite', 'ActiviteAvancee', 'Comprehension'):
+                for question in sub.questions:
+                    fname =  ('%s.xml' % question.id)
+                    problem_outdir = os.path.join(edx_outdir,'problem', fname)
+                    zipFile.writestr(problem_outdir, toEdxProblemXml(question).encode("UTF-8"))
+                    #zipFile.writestr(module.module+'/EDX/problem/'+fname, toEdxProblemXml(question).encode("UTF-8"))
+
+
+    # Add other files
+    for folder, dfile in EDX_DEFAULT_FILES.items():
+        with open(EDX_TEMPLATES_PATH+'/'+folder+'/'+dfile, 'r') as myfile:
+            data=myfile.read()
+            file_path = os.path.join(edx_outdir,folder,dfile)
+            zipFile.writestr(file_path, data.encode("UTF-8"))
+            #zipFile.writestr(module.module+'/EDX/'+folder+'/'+dfile, data.encode("UTF-8"))
+
+    # Render and add policies/course files
+    course_policies_files =  ['grading_policy.json', 'policy.json']
+
+    jenv = loadJinjaEnv()
+    for pfile in course_policies_files:
+        pfile_template = jenv.get_template(os.path.join('policies','course', pfile))
+        pjson = pfile_template.render(module=module)
+        pjson = json.dumps(json.loads(pjson),ensure_ascii=True,indent=4,separators=(',', ': '))
+        json_path=os.path.join(edx_outdir,'policies/course',pfile)
+        zipFile.writestr(json_path, pjson.encode("UTF-8"))
+        #zipFile.writestr(module.module+'/EDX/policies/course/'+pfile, pjson.encode("UTF-8"))
+
+    # Write main course.xml file
+    course_template = jenv.get_template("course.tmpl.xml")
+    course_xml = course_template.render(module=module, grademap=EDX_GRADER_MAP)
+    course_path=os.path.join(edx_outdir,'course.xml')
+    zipFile.writestr(course_path, course_xml.encode("UTF-8"))
+    #zipFile.writestr(module.module+'/EDX/course.xml', course_xml.encode("UTF-8"))
+
+    # pack it up into a tar archive
+    # by using regex to determine which file must be included in that archive
+    # (we have to look into the zip being generated)
+    tab=zipFile.namelist()
+    reEdxPath = re.compile('^'+module.module+'/EDX')
+
+    tarArchiveIO = StringIO.StringIO()
+
+    # We open the tar archive inside of the StringIO instance
+    with tarfile.open(mode='w:gz', fileobj=tarArchiveIO) as tar:
+        #for each EDX element belonging to the module
+        for elt in tab:
+            res=reEdxPath.match(elt)
+            if res:
+                # adding the file to the tar archive
+                # (we need tarInfo and StringIO instance for not writing anything on the disk)
+                data=zipFile.read(elt)
+                info=tarfile.TarInfo(name=elt)
+                info.size=len(data)
+                tar.addfile(tarinfo=info, fileobj=StringIO.StringIO(data))
+        tar.close()
+
+    tarArchiveIO.seek(0)
+    zipFile.writestr(module.module+'/'+module.module+'_edx.tar.gz', tarArchiveIO.read())
+
+    return zipFile

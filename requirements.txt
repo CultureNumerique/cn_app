@@ -4,11 +4,25 @@ lxml
 yattag
 python-slugify
 markdown
+html
 MarkdownSuperscript
 flask
 requests
+
+# test
+mock
+beautifulsoup
 beautifulsoup4
+python-coveralls
+coveralls
+coverage
+pytest
+pytest-pep8
+pytest-cov
+
 # used only to generate doc with Sphinx+recommonmark
 Sphinx
 sphinx-rtd-theme
 recommonmark
+
+

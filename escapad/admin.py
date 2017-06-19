@@ -35,6 +35,7 @@ class RepositoryAdmin(admin.ModelAdmin):
     #========  custom fields  =============#
     # Below are the method used to define the custom fields, i.e those not defined in model.py
     def build_url(self, obj):
+        print obj.slug
         url = reverse('build_repo', args=(obj.slug,))
         return '<a href="%s" target="_blank">%s<a>' % (url, 'build')
     build_url.allow_tags = True

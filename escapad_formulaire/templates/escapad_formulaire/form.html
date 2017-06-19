@@ -1,0 +1,37 @@
+{% extends "app.html" %}
+
+{% block titre %}Formulaire{% endblock %}
+
+{% block script %}
+
+{%  load static %}
+<script type="text/javascript" src="{% static 'js/form_dom.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+    <h2>Création d'un cours</h2>
+
+    <form action="{% url 'form_upload' %}" method="post"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+          <legend>Informations générales</legend>
+          {{ form.as_p}}
+        </fieldset>
+
+        <div id="modules">
+          <fieldset id="module1">
+            <legend>Module 1</legend>
+            {{formMod.as_p}}
+          </fieldset>
+        </div>
+
+
+        <input type="submit" value="Submit" />
+        <input type="button" value="Ajouter un module" onclick="createModule()">
+        <input type="button" value="Retirer un module" onclick="removeModule()">
+        <input id="nb_module" name="nb_module" type="hidden" value="1"/>
+    </form>
+
+{% endblock %}

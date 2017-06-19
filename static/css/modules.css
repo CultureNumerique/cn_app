@@ -307,6 +307,11 @@ span.sec-title{
 	margin-left: -1.4em;
 }
 
+.global_feedback h1 {
+	font-size : 22px;
+	text-decoration: underline;
+}
+
 .global_feedback h2{
 	margin-left: 0px!important;
 }
@@ -325,6 +330,10 @@ span.sec-title{
 }
 .question ul{
     list-style: none;
+}
+
+.question li > p {
+	display: inline;
 }
 
 .right_answer {
@@ -416,7 +425,7 @@ iframe{
 }
 .icon-plus-circled{
 	position: absolute;
-	margin-top: 170px;
+	margin-top: 200px;
 	z-index: 1;
 }
 .teaser{
