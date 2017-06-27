@@ -1,0 +1,46 @@
+<!--
+Editing course Template
+Get from the models is_home, base_url, and url_module,
+which are necessary to get the course preview.
+-->
+
+{% extends "app.html" %}
+
+{% block titre %}Formulaire{% endblock %}
+
+
+{% block script %}
+{%  load static %}
+<script type="text/javascript" src="{% static 'js/etherpad_process.js' %}"></script>
+<script type="text/javascript">
+  var is_home = "{{ is_home }}" == 'True'
+  var base_url = "{% url 'home' %}"
+  var url_module="{{ url }}";
+</script>
+<script type="text/javascript" src="{% static 'js/detect_change.js' %}"></script>
+
+
+{% endblock %}
+
+{% block onload %}
+  onload="addlistener(); setValue();"
+{% endblock %}
+
+{% block content %}
+
+    <h2>Modification du module : {{ name }}</h2>
+
+        <fieldset id="home">
+          <legend>Ecriture du cours</legend>
+          <input type="button" value="Afficher/Masquer l'aperçu" onclick="afficher_apercu()">
+          <input type="checkbox" id="feedback" value="feedback" onclick="setValue()">
+          Afficher le feedback
+          <br>
+          <iframe id="framehome" name="framehome" src="{{ full_url }}" width="45%" height="500px"></iframe>
+          <iframe id="frametest" name="frametest" src="" width="45%" height="500px"></iframe>
+
+          <br>
+          <a href="{% url 'cours' id_cours %}"><button>Retourner au cours </button></a>
+        </fieldset>
+
+{% endblock %}

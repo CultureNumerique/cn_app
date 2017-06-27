@@ -1,0 +1,55 @@
+<!-- Template for listing the user's course -->
+
+{% extends "app.html" %}
+
+{%  load static %}
+
+{% block content %}
+  <h2>Dépôt :  {{ repository.git_name }}</h2>
+
+  {% if user.is_authenticated %}
+
+    <table>
+      <tr>
+        <th>Dépôt</th>
+        <td>{{ repository.git_name }}</td>
+      </tr>
+      <tr>
+        <th>Git user</th>
+        <td>{{ repository.git_username }} </td>
+      </tr>
+      <tr>
+        <th>Dernière compilation</th>
+        <td>{{ repository.last_compiled }} </td>
+      </tr>
+      <tr>
+        <th>Dépôt synchronisé</th>
+        <td>{{ repository.repo_synced }} </td>
+      </tr>
+      <tr>
+        <th>Fournisseur</th>
+        <td>{{ repository.provider }} </td>
+      </tr>
+    </table>
+
+
+    <br>
+
+    <form action="{% url 'repository' repository.slug %}" method="post"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset id="home">
+          <legend>Modifier les informations du dépôt</legend>
+          {{ form.as_p}}
+        </fieldset>
+
+        <input type="submit" value="Modifier" />
+
+    </form>
+
+    <a href="{% url 'my_repositories' %}"><button>Retour à mes dépôts</button></a>
+
+  {% else %}
+  <p> Vous n'êtes pas censé avoir accès à cette page, veuillez vous connecter !</p>
+  {% endif %}
+
+{% endblock %}

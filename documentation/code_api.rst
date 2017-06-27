@@ -95,7 +95,7 @@ Subclass of AnyActivity
     :undoc-members:
 
 ActiviteAvancee
-~~~~~~~~~~~~~~-
+~~~~~~~~~~~~~~~
 
 Subclass of AnyActivity
 
@@ -112,6 +112,11 @@ Here we detail the code documentation of the rest of the Escapad parser.
 cnExport
 ~~~~~~~~
 .. automodule:: cnExport
+  :members:
+
+cnExportLight
+~~~~~~~~~~~~~
+.. automodule:: cnExportLight
   :members:
 
 fromGift

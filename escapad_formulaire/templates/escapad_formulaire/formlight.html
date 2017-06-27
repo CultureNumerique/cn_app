@@ -1,0 +1,31 @@
+
+<!-- Template Creating course from archive -->
+
+{% extends "app.html" %}
+
+{% block titre %}Formulaire{% endblock %}
+
+{% block content %}
+
+    <ul>
+      {% for erreur in erreurs %}
+        <li>{{erreur}}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Veuillez insérer l'archive pour créer le cours</h2>
+    <h3>Veillez à bien respecter l'architecture!</h3>
+
+    <form action="{% url 'form_upload_light' %}" method="post"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+          <legend>Archive du cours</legend>
+          {{ form.as_p}}
+        </fieldset>
+
+        <input type="submit" value="Submit" />
+    </form>
+
+
+
+{% endblock %}

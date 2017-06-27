@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import json
 import logging
 import os
 import subprocess
-import shutil
 
 from django.utils import timezone
 from django.conf import settings
@@ -12,13 +10,16 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 
 from escapad.models import Repository
-from escapad.utils import cnrmtree, run_shell_command
+from escapad.utils import run_shell_command
 
-logger = logging.getLogger(__name__) # see in cn_app.settings.py logger declaration
+# see in cn_app.settings.py logger declaration
+logger = logging.getLogger(__name__)
+
 
 # utility used by signal receivers below
 def create_repo_dir(dir_name, repo_url):
-    """ function to create and sync a git repo(repo_url) with local dir (dir_name) """
+    """ function to create and sync a git repo (repo_url)
+        with local dir (dir_name) """
     repo_path = os.path.join(settings.REPOS_DIR, dir_name)
     current_path = os.path.abspath(os.getcwd())
     try:
@@ -31,12 +32,14 @@ def create_repo_dir(dir_name, repo_url):
         git_cmd = ("git clone %s . --depth 1 --no-single-branch" % repo_url)
         subprocess.check_output(git_cmd.split())
     except Exception as e:
-        logger.error("%s | Problem when creating and syncing dir %s with url %s \n Error : %s " % ( timezone.now(), dir_name, repo_url, e))
+        logger.error("%s | Problem when creating and syncing dir %s with url %s \n Error : %s " %
+                     ( timezone.now(), dir_name, repo_url, e))
         os.chdir(current_path)
         return False
     # In any case, go back to current_path
     os.chdir(current_path)
-    logger.warning("%s | successful creation of repo %s with url %s" % (timezone.now(), dir_name, repo_url))
+    logger.warning("%s | successful creation of repo %s with url %s" %
+                   (timezone.now(), dir_name, repo_url))
     return True
 
 
@@ -58,19 +61,24 @@ def resync_repo_dir(sender, instance, update_fields, **kwargs):
         # FIXME if default branch changed resync it!
 
 
-#do this *after* saving a Repository
+# do this *after* saving a Repository
 @receiver(post_save, sender=Repository)
 def sync_repo_dir(sender, instance, created, update_fields, **kwargs):
     """ Create a dir named [slug] and git clone [git_url] within it """
-    logger.warning(" %s | creating repo dir ?= %s | update_fields = %s" % (timezone.now(), created, update_fields))
-    if update_fields == {'repo_synced'}: #just to avoid infinite recursion because of successive saving (see below)
+    logger.warning(" %s | creating repo dir ?= %s | update_fields = %s" %
+                   (timezone.now(), created, update_fields))
+    # just to avoid infinite recursion because of successive saving (see below)
+    if update_fields == {'repo_synced'}:
         return
-    if created: #meaning we're creating a new record
+    # meaning we're creating a new record
+    if created:
         instance.repo_synced = create_repo_dir(instance.slug, instance.git_url)
         instance.save(update_fields={'repo_synced'})
         return
-    else: # updating a repo object => see above pre_save receiver
+    # updating a repo object => see above pre_save receiver
+    else:
         return
+
 
 # do this *after* one has deleted a Repository object
 @receiver(post_delete, sender=Repository)
@@ -83,7 +91,8 @@ def delete_repo_dir(instance, **kwargs):
         try:
             run_shell_command('rm -fR %s' % path)
         except Exception as e:
-            logger.error("%s | Problem when deleting dir %s | error = %s" %  (timezone.now(), path, e))
+            logger.error("%s | Problem when deleting dir %s | error = %s" %
+                         (timezone.now(), path, e))
             return False
     # delete zip if it exists:
     zip_path = sites_path+'.zip'

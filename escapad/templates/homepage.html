@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Accueil Esc@pad</title>
-    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
-    <link rel="stylesheet" type="text/css" href="/static/admin/css/login.css" />
-    <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
-    <style type="text/css">
-        /* ---  email hiding ---- */
-        .email-span:after {
+  <title>Accueil Esc@pad</title>
+  {%  load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/base.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static '/admin/css/login.css' %}" />
+  <script type="text/javascript" src="{% static '/admin/js/vendor/jquery/jquery.js' %}"></script>
+  <style type="text/css">
+    /* ---  email hiding ---- */
+    .email-span:after {
           content: '@univ-lille3.fr';
-        }
-        .email {
+    }
+    .email {
           display: inline-block;
           font-weight: bold;
           cursor: pointer;
-        }
-        .no_display p {
+    }
+    .no_display p {
           display: none;
-        }
-        .no_display:after {
+    }
+    .no_display:after {
           content: '.';
-        }
-    </style>
-    <meta name="robots" content="NONE,NOARCHIVE" />
+    }
+  </style>
+  <meta name="robots" content="NONE,NOARCHIVE" />
 </head>
 <body class="login" data-admin-utc-offset="0">
     <!-- Container -->
@@ -37,9 +38,11 @@
         <!-- Content -->
         <div id="content" class="colM">
             <div id="content-main" style="text-align:center;">
-                <h2 ><a class="button" style="padding:0.5em;" href="/admin/">Ajouter ou gérer un dépôt de cours Esc@pad</a> </h2>
+                <h2 ><a class="button" style="padding:0.5em;" href="{% url 'admin:index' %}">Ajouter ou gérer un dépôt de cours Esc@pad</a> </h2>
                 <br class="clear" />
-                <h2><a class="button" style="padding:0.5em;" href="http://escapad.univ-lille3.fr/documentation">Voir la documentation Esc@pad</a> </h2>
+                <h2><a class="button" style="padding:0.5em;" href="{% url 'connexion' %}">Accéder à l'éditeur de cours collaboratif</a> </h2>
+                <br class="clear" />
+                <h2><a class="button" style="padding:0.5em;" href="{% static 'documentation' %}">Voir la documentation Esc@pad</a> </h2>
                 <br class="clear" />
                 <h2><a class="button email" style="padding:0.5em;">
                       Contactez <span class="email-span">alain<span class="no_display"><p>point</p></span>preux</span> pour obtenir un accès

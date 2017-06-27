@@ -1,0 +1,33 @@
+<!--
+Template for reuploading a course into the Esc@pad application.
+We create new pad for each module, and we associate the course to the current user
+-->
+
+{% extends "app.html" %}
+
+{% block titre %}Formulaire{% endblock %}
+
+{% block content %}
+
+    <ul>
+    {% for erreur in erreurs %}
+      <li>{{erreur}}</li>
+    {% endfor %}
+    </ul>
+
+    <h2>Réuploader un cours sur la plateforme</h2>
+    <h4>Veuillez insérer l'archive export.tar.gz fournie lors de la génération du site</h4>
+
+    <form action="{% url 'form_reupload' %}" method="post"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+          <legend>Archive</legend>
+          {{ form.as_p}}
+        </fieldset>
+
+        <input type="submit" value="Submit" />
+    </form>
+
+
+
+{% endblock %}

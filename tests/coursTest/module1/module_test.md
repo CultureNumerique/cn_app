@@ -78,8 +78,7 @@ information quelle qu'elle soit.</p>#<p>Oui !</p>
 ####<p>La numérisation est l'opération qui consiste à représenter sous forme de nombres une information, quelle qu'elle soit.</p> }
 
 ::Où sont les processeurs ?::
-[html]<p>Parmi ces objets, quels sont ceux équipés de
-processeur(s) \:</p>{ ~%20%<p>tablettes</p>
+[html]<p>Parmi ces objets, quels sont ceux équipés de processeur(s) \:</p>{ ~%20%<p>tablettes</p>
 ~%20%<p>smartphones</p> ~%20%<p>box ADSL</p>
 ~%20%<p>lecteur mp3</p> ~%20%<p>ordinateur</p>
 ~<p>aucun</p>#<p>Tous !</p> ####<p>Tous
@@ -583,10 +582,10 @@ Cela est très pratique pour se connecter avec un ordinateur là où seules des 
 \n
 3G,4G,H+,Edge
 {
-3G -> 2
-4G -> 4
-H+ -> 3
-E (Edge) -> 1
+=3G -> 2
+=4G -> 4
+=H+ -> 3
+=E (Edge) -> 1
 ####
 # Les normes et leurs sigles
 \n
@@ -612,7 +611,6 @@ Généralement le débit est mesuré en bit par seconde `bit/s` ou ses variantes
 \n
 Du débit, dépend notamment le *temps* nécessaire pour télécharger un morceau de musique ou la qualité d'une vidéo lue en continu.
 Le nombre de bits que l'on peut stocker sur un DVD Blu-ray double couche est 50 gigaoctets (Go), soit 400 gigabits, car un octet est une séquence de 8 bits. Calculer le temps de transmission d'un DVD Blu-ray double couche complet dans les cas suivants:
-\n
     - l'ADSL à 10Mb/s
     - La fibre à 1Gb/s
     - Le wifi à 50Mb/s

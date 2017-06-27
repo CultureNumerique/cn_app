@@ -1,0 +1,494 @@
+#contenudroite {
+  padding-left: 20px;
+}
+
+th, td {
+    padding-right: 20px;
+    text-align: left;
+}
+
+h5 {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+form {
+  margin-top: 15px;
+}
+
+
+.errorlist {
+  color: red;
+}
+
+body {
+	position:relative;
+}
+
+/* RESET */
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.container-fluid {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+	min-height:100%;
+	overflow: hidden;
+}
+
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+  /*  min-height: 1px;*/
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+}
+
+a, a:link, a:hover, a:active, a:visited {
+	text-decoration:none;
+	outline: none;
+}
+
+/* ---------------------------------------------------------*/
+/* JASNY OFFCANVAS */
+/* ---------------------------------------------------------*/
+/* Partie définissant les changements au glissement du menu */
+
+@media (min-width: 992px) {
+
+	body {
+	padding-left: 300px;
+	}
+
+	.contenudroite{
+		width: 800px;
+
+	}
+
+
+	#content {
+	 padding-left:0 !important;
+	}
+
+	#menugauche {
+	 top:3.9em;
+	}
+
+	.breadcrumb {
+	 position:fixed;
+	 width:100%;
+	}
+
+}
+/* empêche de désactiver le overflow en mode menu déplié*/
+body{
+	overflow-x: hidden;
+	overflow-y: auto!important;
+}
+
+/* ---------------------------------------------------------*/
+/* STYLES TEXTES */
+/* ---------------------------------------------------------*/
+
+h1 {
+	/*font-family: 'dynobold';*/
+	/*font-weight: bold;*/
+    padding-top: 1em;
+}
+
+h2 {
+	/*font-weight:bold;*/
+	font-size:200%;
+	color: #C84B24;
+	margin-top:1em;
+    margin-bottom: 0.5em;
+}
+
+h3 {
+	/*font-weight:bold;*/
+	font-size:170%;
+	color: #AFA70E;
+	margin-top:1em;
+}
+
+p {
+	/*font-size:120%;*/
+	color: #4C4C4C;
+}
+
+hr {
+	border: 1px solid  #AFA70E;
+}
+
+iframe {
+	border: solid 3px #DCDEDE;
+}
+
+/* ---------------------------------------------------------*/
+/* MENU GAUCHE
+/* ---------------------------------------------------------*/
+
+#menugauche {
+	z-index: 1031; /* so that it stays above unfolding button*/
+	direction: rtl;
+	top:3.9em;
+}
+#menugauche h1{
+	direction: ltr;
+}
+#accordion{
+	direction: ltr;
+}
+
+#menugauche-sm {
+	 top:3.9em;
+	 left:1.73em;
+ }
+/* bouton chevron 'gauche' pour replier le menu */
+#menugauche-sm-left{
+	top:3.9em;
+	margin-left: 299px;
+}
+/* add opacity to content when menu is unfolded*/
+#menugauche.in+#content{
+	opacity: 0.3;
+}
+
+ #menugauche-sm2 h4 {
+    margin-left: 0em !important;
+}
+
+ /*#menugauche-sm2 {
+	 top:3.2em;
+ }
+
+ #menugauche-sm2 h1{
+	margin-top: 1em;
+	margin-left:0.3em;
+}*/
+
+.menugauchebtn {
+	background-color:#333333;
+	border:none;
+	color:#fff;
+	margin-left: -1.73em;
+}
+/* Added by Freddy */
+
+/* Style menugauche statique*/
+.menugauche h1{
+	margin-left:0.5em;
+	padding-bottom: 20px;
+	font-family: 'dynobold';
+	text-transform: capitalize;
+	font-size: 1.8em;
+	padding-top: 0.4em
+}
+.menugauche .panel-default > .panel-heading {
+	border: none;
+	background-color: transparent !important;
+	color:#fff;
+}
+.menugauche .list-group-item {
+	border: none;
+	background-color: transparent !important;
+	margin-left:3.5em;
+	padding: 8px 8px;
+}
+.menugauche .panel {
+	border: none;
+	background-color: transparent !important;
+	box-shadow: 0 0px 0px rgba(0, 0, 0, 0.05);
+}
+.menugauche a {
+	color:#fff;
+	/*font-weight:bold;*/
+    /*display: inline !important;*/
+    padding: 0 !important;
+}
+.menugauche a:active {
+	color:#C84B24;
+	/*font-weight:bold;*/
+}
+.menugauche a:hover {
+	color:#AFA70E;
+	/*font-weight:bold;*/
+    background-color:transparent!important;
+}
+.menugauche h4{
+	/*font-weight:bold;*/
+	text-decoration:none;
+	margin-left:1.3em;
+}
+.menugauche h4:active{
+	color: #AFA70E;
+}
+span.sec-num{
+	display: inline-block;
+	font-size: 2em;
+	margin-right: 0.3em;
+}
+span.sec-title{
+	display: inline-block;
+	width: 85%;
+	vertical-align: top;
+	margin-bottom: 0.5em;
+	margin-top: 0.2em;
+	padding-left: 0.2em;
+}
+/*.menugauche h4:first-letter {
+	padding: 0.2em 0.4em 0 0;
+	vertical-align: bottom;
+}*/
+.menugauche .panel-group .panel-heading + .panel-collapse > .list-group, .panel-group .panel-heading + .panel-collapse > .panel-body {
+    border-top: none;
+}
+
+/* Style menugauche pour interactions et dépliage du menu */
+.menugauche li > ul.list-group{
+	display: none;
+}
+.menugauche li.active > ul.list-group{
+	background-color:#333333;
+	display: block;
+}
+.menugauche li.list-group-item.active a {
+	color:#C84B24;
+	/*font-weight:bold;*/
+}
+
+
+/* ---------------------------------------------------------*/
+/* BREADCRUMBS */
+/* ---------------------------------------------------------*/
+
+.breadcrumb {
+	background: rgba(220,222,222,1);
+	border-radius: 0;
+    list-style: outside none none;
+	position:fixed;
+	width:100%;
+	top:3.9em;
+	margin-bottom: 1em;
+	padding-left:2em;
+	display: block;
+	z-index: 2;
+}
+
+.breadcrumb > li + li::before {
+    color: #525A59;
+	font-family: "culture-numerique" ;
+    content: "i ";
+    padding: 0 5px;
+	vertical-align:middle;
+	padding-right: 1em;
+	padding-left: 1em;
+}
+
+.breadcrumb a {
+    color: #525A59;
+}
+
+.breadcrumb > .active {
+    color: #AFA70E;
+	font-weight:bold;
+}
+
+/* ---------------------------------------------------------*/
+/* STRUCTURE */
+/* ---------------------------------------------------------*/
+
+#content {
+	padding-top: 3.2em;
+	padding-left:1em;
+}
+
+.menugauche {
+	margin:0;
+	padding: 0;
+	background-color: #525A59;
+	color: #fff;
+    float: none;
+	vertical-align:top;
+}
+
+.contenudroite {
+	padding-left:4em;
+	padding-top:2em;
+	padding-right:2em;
+	padding-bottom:4em;
+	float: none;
+	max-width: 800px;
+	margin: auto;
+}
+
+.contenudroite h2 {
+	margin-left: -1.4em;
+}
+
+.global_feedback h1 {
+	font-size : 22px;
+	text-decoration: underline;
+}
+
+.global_feedback h2{
+	margin-left: 0px!important;
+}
+
+.questiontext{
+	padding-top: 0.5em;
+}
+
+.questiontext ul {
+	list-style: circle!important;
+	padding-left: 1em;
+}
+.global_feedback ul {
+	list-style: circle!important;
+	padding-left: 1em;
+}
+.question ul{
+    list-style: none;
+}
+
+.question li > p {
+	display: inline-grid;
+}
+
+.right_answer {
+    font-weight: bold;
+    color: green;
+}
+
+.wrong_answer {
+    text-decoration: line-through;
+}
+
+.question ul > li > input{
+    margin-right: 0.5em;
+}
+
+/* Added by Freddy */
+
+/* offset pour les ancres */
+section:before {
+    display: block;
+    content: " ";
+    margin-top: -90px;
+    height: 90px;
+    visibility: hidden;
+}
+
+
+/* Video related stuff */
+.cours_video{
+    display: none;
+}
+
+.play_thumb{
+    width: 480px;
+    height:270px;
+}
+
+.iframe_cont {
+    padding-bottom: 1em;
+}
+
+iframe{
+	border: solid 3px #DCDEDE;
+
+}
+
+.play_thumb img{
+    width:100%;
+    float: left;
+    border: 3px solid #dcdede;
+}
+
+.play-button {
+    height: 40px;
+    width: 65px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    position: relative;
+	top: 35.5%;
+	left: 42.5%;
+}
+
+.play-button:hover {
+    background-color: rgba(0, 173, 239, 0.9);
+}
+
+.play-button:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10.5px;
+    left: 24px;
+    margin: 0 auto;
+    border-style: solid;
+    border-width: 9.5px 0 9.5px 17px;
+    border-color: transparent transparent transparent rgba(255, 255, 255, 1);
+}
+
+
+/* montrer / cacher les sections de cours */
+
+
+.hidden-text.in+div.teaser{
+	display: none;
+}
+.teaser-button{
+	cursor: pointer;
+}
+.icon-plus-circled{
+	position: absolute;
+	margin-top: 170px;
+	z-index: 1;
+}
+.teaser{
+	cursor: pointer;
+	height: 200px;
+	overflow: hidden;
+	/*margin-bottom: 2em;*/
+}
+.tease {
+    background: rgba(0, 0, 0, 0) url("https://www.mediapart.fr/images/articles/tease.png") repeat-x scroll left bottom;
+    height: 125px;
+    position: absolute;
+    width: 100%;
+	margin-top: 75px;
+}
+
+/* Annexe */
+.annex-sep{
+	width:80%;
+	border-top: 1px solid white;
+	margin: 5% 5% 5% 10%;
+}
+
+#sec_A {
+	padding-bottom: 20em;
+}
+
+#sec_A > p {
+	padding-top: 2em;
+}
+
+[href="#sec_A"]{
+	color: #AFA70E!important;
+}
+
+[href="#sec_A"] .sec-title {
+	width: 70%;
+	margin-left: -1.5em;
+}

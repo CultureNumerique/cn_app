@@ -1,24 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import datetime
-import json
 import logging
-import mimetypes
 import os
 import shlex
-import shutil
 import subprocess
 import sys
 
 
 from django.utils import timezone
-from django.conf import settings
-from django.db.models.signals import post_save, pre_save, post_delete
-from django.dispatch import receiver
 
-from escapad.models import Repository
-
-logger = logging.getLogger(__name__) # see in cn_app.settings.py logger declaration
+# see in cn_app.settings.py logger declaration
+logger = logging.getLogger(__name__)
 
 
 def run_shell_command(command_line):
@@ -32,7 +24,7 @@ def run_shell_command(command_line):
             stderr=subprocess.STDOUT,
             env={'PYTHONPATH': os.pathsep.join(sys.path)},
         )
-        process_output, _ =  command_line_process.communicate()
+        process_output, _ = command_line_process.communicate()
         logger.warn(process_output)
         returncode = command_line_process.returncode
     except (OSError, ValueError) as exception:
@@ -45,6 +37,7 @@ def run_shell_command(command_line):
         return True, process_output
     else:
         return False, process_output
+
 
 def cnrmtree(path):
     """ custom rmtree func to overcome unicode files bug """

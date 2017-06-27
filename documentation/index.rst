@@ -14,6 +14,7 @@ Contents:
    usage
    syntaxe
    tutoriel
+   tutoriel_app
    administration
    installation
    contribuer

@@ -51,7 +51,7 @@ C'est un type de sous-section simple consistant en du texte structuré à l'aide
 
 ### Extension markdown
 
-Pour compléter les spécifications du markdow, plusieurs variantes ont été développées. Nous incluons dans Esc@pad, la variante de syntaxe ["PHP Markdown Extra"](https://michelf.ca/projects/php-markdown/extra/). Cett variante permet par exemple de spécifier des attributs attachés à des éléments de la syntaxe (lien, titre, image, etc). Ces ["special attributes"](https://michelf.ca/projects/php-markdown/extra/#spe-attr) permettent par exemple d'ajouter des classes CSS à une image ou à un bloc de texte, ou un titre:
+Pour compléter les spécifications du markdow, plusieurs variantes ont été développées. Nous incluons dans Esc@pad, la variante de syntaxe ["PHP Markdown Extra"](https://michelf.ca/projects/php-markdown/extra/). Cetet variante permet par exemple de spécifier des attributs attachés à des éléments de la syntaxe (lien, titre, image, etc). Ces ["special attributes"](https://michelf.ca/projects/php-markdown/extra/#spe-attr) permettent par exemple d'ajouter des classes CSS à une image ou à un bloc de texte, ou un titre:
 
 ```
 [link](http://example.com){: class="foo bar" .titre title="Some title!" }`  
@@ -159,7 +159,7 @@ ou
 
 ### Syntaxe GIFT
 
-Ces activités sont rédigées en GIFT; chaque question est séparée par une ligne vide. La syntaxe Gift a été proposé par l'équipde Moodle pour permettre de gagner du temps dans la rédaction de quizz et de tests. Cette syntaxe est disponible sur [cette page](https://docs.moodle.org/28/en/GIFT_format) (voir aussi plus bas une série d'exemples de questions en GIFT). Il s'agit d'un format "texte" qui peut donc s'éditer dans n'importe quel éditeur de texte.
+Ces activités sont rédigées en GIFT; chaque question est séparée par une ligne vide. La syntaxe Gift a été proposé par l'équipde Moodle pour permettre de gagner du temps dans la rédaction de quizz et de tests. Cette syntaxe est disponible sur [cette page](https://docs.moodle.org/2x/fr/Format_GIFT) (voir aussi plus bas une série d'exemples de questions en GIFT). Il s'agit d'un format "texte" qui peut donc s'éditer dans n'importe quel éditeur de texte.
 
 Exemple:
 

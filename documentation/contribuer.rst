@@ -1,8 +1,7 @@
 Contribuer au code d'Esc@pad
 ============================
 
-Cette section est dédiée aux contributeurs du code d'Escapad et décrit les besoins prioritaires déjà identifiés.
-Au 15 décembre 2016, Esc@pad a atteint son premier objectif: faire la preuve du concept d'une chaine éditoriale intégrée permettant de créer à partir d'un fichier source en format texte un contenu pédagogique riche disponible en plusieurs formats (Web, EDX, Moodle). Les besoins prioritaires se décomposent pour l'instant en 3 grands catégories (détaillés ci-après à la suite de l'architecture globale du code)
+Cette section est dédiée aux contributeurs du code d'Escapad et décrit comment contribuer au projet Esc@pad dans les meilleurs conditions.
 
 
 Architecture
@@ -18,12 +17,17 @@ Le code d'Escapad est décomposé comme suit:
 
 Cette partie du code réside dans les dossiers:
 
+- pygiftparser (module installé dans le virtualenv depuis Git):
+
+	responsable du découpage et du parsing des questions rédigées en GIFT dans les sous-section de type Activité; gère également l'export web des questions. Source du package : https://github.com/mtommasi/pygiftparser
+
 - src:
+
     - cnExport.py : c'est le script de départ; il amorce le parsing et contrôle les différents exports directemenr (Web) ou via  toEDX.py ou toIMS.py.
     - model.py : contient le modèle; le parsing est amorcé par la création d'un objet Module défini dans ce modèle
-    - fromGIF.py : responsable du découpage et du parsing des questions rédigées en GIFT dans les sous-section de type Activité; gère également l'export web des questions
+    - fromGIFT.py : module qui surchage les classes de :mod:`pygiftparser` en ajoutant la transformation des objets GIFT en XML pour EDX et IMS-CC.
     - utils.py : contient quelques méthodes utilitaires pour l'écriture de fichiers et certains filtres
-- templates: La génération du mini-site et de l'archive EDX utilise des templates écrit en Jinja2 et situé dans ce dossier. Pour le mini-site web
+- templates: La génération du mini-site et de l'archive EDX utilise des templates écrit en Jinja2 et situé dans ce dossier.
 - static : dossier regroupant les fichiers js, css, etc. utilisés par la version mini-site web de l'export. Ce dossier est donc copié tel quel dans chaque export web.
 - logs : contient les logs uniquement pour cnExport
 
@@ -47,82 +51,249 @@ Son code est situé dans les dossiers:
 - les logs de l'application Django sont situés dans le fichier debug.log dont l'emplacement est défini dans le fichier cn_app/site_settings.py
 - le fichier manage.py n'est pas à modifier à priori (sauf cas avancé)
 
+Contribuer au code
+------------------
+
+*Requirement*
+- Avoir un compte GitHub.
+
+Pour nous aider sur le projet Culture Numérique, forker ce repository : 
+https://github.com/CultureNumerique/cn_app
+
+Toutes les modifications doivent s'effectuer sur votre instance forkée et doivent être testée avant d'envoyer une pull-request. Pour plus de sûreté, travailler sur une nouvelle branche ( pour plus d'aide : https://help.github.com/categories/collaborating-with-issues-and-pull-requests/)
+
 
 Couverture de tests
 --------------------
 
 La stratégie de tests présente différents aspects:
+Chaque module de src est testé dans un fichier de tests qui lui est propre.
 
-1. le test du parsing des fichiers de code source de cours qui aboutit à la construction d'un modèle de cours (cf :class:`model.Module`); dans ce cas on compare les objets générés avec un objet de contrôl sérialisé (`tests.config.json`)
-2. le test de la génération des exports Web (cf :mod:`cnExport`), IMS-CC (:mod:`toIMS`), et EDX (:mod:`toEDX`); ici ce seront les archives générés qui seront comparés avec des archives de contrôle.
-3. le test des web services développés en Django: dans ce cas il s'agit de contrôler la manipulation des fichiers et l'exécution des appels web.
-4. enfin, une stratégie de test plus granulaire qui consiste à tester chaque méthode séparemment en vérifiant la cohérence des entrées et sorties (WIP).
+1. model_test.py : le test du parsing des fichiers de code source de cours qui aboutit à la construction d'un modèle de cours (cf :class:`model.Module`); On teste également les fonctions des classes de model.
+2. edx_test & ims_test: le test de la génération des exports IMS et EDX. On vérifie que l'archive est correctement générée et comme pour model_test.py, on vérifie la bonne structure de chaque format de question suite à sa modification en XML.
+3. utils_test.py & cnexport_test.py, une stratégie de test plus granulaire qui consiste à tester chaque méthode séparemment en vérifiant la cohérence des entrées et sorties (WIP).
+
 
 Pour lancer les tests:
 
 - ``$ cd tests``
-- ``$ python tests.py``
+- ``$ pytest`` 
+ou
+
+- ``$ pytest --cov=src --cov=pygiftparser``
+pour avoir le taux de couverture des fichiers src.
+
+On peut également lancer les tests avec ``python``:
+
+- ``python all_test.py`` pour lancer tous les tests.
+- ``python [nom_du_fichier_test].py``
+
+Paquages de test
+~~~~~~~~~~~~~~~~
+
+- `Unittest <https://docs.python.org/2/library/unittest.html>`_
+- `Mock <https://docs.python.org/3/library/unittest.mock.html>`_
+- `Pytest <https://pypi.python.org/pypi/pytest>`_
+- `Coverage <https://coverage.readthedocs.io/en/coverage-4.4.1/#quick-start>`_  permet de voir le taux de couverture des tests :
+
+	- ``$ coverage run [nom_du_module_test].py``
+Pour avoir un aperçu graphique :
+
+	- ``$ coverage html``
+qui crée les fichiers html pour visualiser quelles lignes sont couvertes.
+- `Coveralls <https://pypi.python.org/pypi/python-coveralls/>`_  
 
 
-Tests globaux controllant le résultat
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Utilisation des web-services d'intégration continue
+---------------------------------------------------
 
-Ce type de test est développé dans le module :mod:`tests`:
+Travis.ci
+~~~~~~~~~
+Travis CI est un logiciel libre et un service en ligne utilisé pour compiler et tester le code source des logiciels développés, notamment en lien avec le service d'hébergement du code source GitHub.
 
-- les tests écrits utilisent le framework de test Python `UnitTest <https://docs.python.org/2/library/unittest.html>`_
-- le fichier ``module_test.md`` est le fichier source de test
-- le fichier ``tests.config.json`` est chargé comme objet de contrôle
+**Comment fonctionne Travis ?**
 
-Le test :class:`tests.ModuleParsingTestCase` récupère d'un côté l'objet sérialisé de contrôle, de l'autre parse le fichier de test pour produire un objet `Module` de test (cf :func:`tests.setUp`). La correspondance entre les champs est ensuite comparée dans la fonction :func:`tests.runTest`, en prenant soin de comparer de manière progressive, en comparant d'abord simplement le nombre de sections, puis en comparant l'exact identité de l'objet de test et de l'objet de contrôle.
+Travis capture les push et pull-request sur un projet GitHub et créer un environnement temporaire grâce aux lignes de commande cachées dans un fichier .travis.yml. On peut ainsi tester si il n'y a pas soucis de compilation, ou également automatiser les tests.
+
+**Architecture fichier .travis.yml**
+
+Plus d'infos `ici
+<https://docs.travis-ci.com/user/customizing-the-build>`_.
+
+- *language* : le langage du projet (ici python)
+
+- *before_script* : 
+	- lance toutes les commandes nécessaires à la mise en place de l'instance.
+	- chaque commande est listée comme ceci.
+
+- *script* : c'est ici que nous lançons les tests.
+
+- *after_success* : action à réaliser si tout s'est bien passé. (Dans notre cas, on fait appel à l'autre web-service, ``coveralls`` (voir partie coveralls)
+	
+Pour utiliser Travis :
+ - rendez vous sur https://travis-ci.org/
+ - connecter vous via votre compte GitHub.
+ - attendez quelques secondes le temps que Travis se synchronise avec votre compte GitHub.
+ - dans le menu à gauche, appuyer sur le '+' à droite de 'My Repositories'
+ - activer la synchronisation de votre fork du projet (normalement : [votre_pseudo]/cn_app), le petit rouage permet d'ouvrir les options de build.
+ - le fichier .travis.yml n'est normalement pas à ajouter car il est déjà présent dans le projet.
+ - si tout s'est bien passé, lors de votre prochain push, travis lancera automatiquement les tests pour vous !
+
+Si vous avez un soucis, une `documentation <https://docs.travis-ci.com/user/getting-started>`_ très détaillée est disponible sur Travis.
+
+Si vous n'êtes pas seul à travailler sur votre fork, les autres développeurs n'auront qu'à suivre les 3 premières instructions pour avoir accès aux informations des différents builds.
+
+*Warning*
+
+
+Par défault, Travis envoie un e-mail à chaque modification pour notifier le chef de projet des résultats des builds. Pour désactiver cette option, insérer :
+
+   ::
+
+       notifications: 
+		email: false
+
+dans le fichier .travis.yml.
+
+
+Coveralls.io
+~~~~~~~~~~~~
+.. _coveralls:
+
+Coveralls, comme Travis, est un web-service permettant de voir rapidement le nombre de lignes de code couvertes par les tests. Coveralls s'appuie sur les builds de Travis pour s'exécuter.
+
+*Warning* Il faut obligatoire configurer Travis pour pouvoir utiliser Coveralls
+
+**Comment utiliser Coveralls ? :**
+
+- se rendre sur https://coveralls.io/
+- comme pour Travis, connecter vous via votre compte GitHub.
+- dans le menu à gauche, cliquez sur 'Add Repos'
+- synchoniser votre repository forké en l'activant
+- si vous avez configurer correctement Travis, Coveralls se lancera au prochain push.
+
+
 
 Ajouter des tests
 ~~~~~~~~~~~~~~~~~
 
-Le test :class:`tests.HtmlGenerationTestCase` (en cours) vise quant à lui à comparer un export web de contrôle avec un export web généré à partir du fichier source de test. Pour développer un nouveau test, il est possible de définir des sous-classes de :class:`tests.ModuleParsingTestCase`, ce qui permet de réutiliser le mécanisme de lancement du test (setUp).
-
-Tests unitaires au niveau des méthodes du parser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Un autre type de test doit être développé pour permettre de vérifier le bon fonctionnement du parsing à partir de la formalisation du bon déroulement de chaque étape du parsing au niveau des méthodes des classes définies dans ``src/model.py``.
+*TODO*
 
 
+Test des web services développés en Django: dans ce cas il s'agit de contrôler la manipulation des fichiers et l'exécution des appels web.
 
-Documentation des tests
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: tests
-    :members:
+*Warning*
 
 
+Si vous voulez ajouter un fichier de tests, veiller à bien lancer son exécution dans le fichier all_test.py en ajoutant cette ligne:
+   ::
+
+       os.system('python [nom_du_nouveau_fichier_de_test].py')
+
+En effet, coverage utilise ce fichier pour vérifier le taux de couverture des lignes exécutées. 
 
 
-
-Amélioration du parser
-----------------------
-
-Il s'agit ici de consolider le code de la partie parser (cf dossier `src`) selon différents aspects:
-- intégrer la librairie [pygiftparser](https://github.com/mtommasi/pygiftparser) afin de remplacer `fromGIFT.py` pour le parsing du GIFT.
-- étendre la librairie [pygiftparser](https://github.com/mtommasi/pygiftparser) pour augmenter la couverture de la spécification GIFT (aujourd'hui partielle)
-- proposer une version du script `cnExport.py` pour produire un site mono-module sans page d'accueil
-- homégénéiser et factoriser le code de génération des archives:
-  - passer la génération de l'IMS-CC via un template Jinja2 (comme pour le web et EDX)
-  - coder en objet ces "Exporters" qui peuvent se décliner en IMSExporter, WebExporter, etc.
-
-
-Améliorer application Web (sous Django)
+Pistes d'améliorations de l'application
 ---------------------------------------
 
-Enrichir les fonctionalités, en particulier du côté de l'application web en Django (contenue dans les sous-dossiers `cn_app` et `escapad`):
+Fichier d'erreur pour l'utilisateur
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- proposer une version sans persistence et sans Git et prenant directement un seul fichier markdown:
-    - un formulaire prenant un fichier markdown en entrée, plus qqs champs calqués sur les options de `src/cnExport.py` (le script exécuté)
-    - validation
-    - création d'un dossier temporaire et upload du fichier à l'intérieur
-    - génération du site en mode mono-module sans page d'accueil
-    - compression en zip du dossier compilé
-    - renvoi à l'usager du zip
-    - effacement du dossier temporaire
-- passer en web service la version ci-avant
-- développer une interface HTML5 permettant d'écrire du markdown+ gift avec panel de rendu reprenant l'export web des modules (épuré ?)
-- coloration syntaxique du GIFT
-- etc. etc. :)
+
+Insérer des médias
+~~~~~~~~~~~~~~~~~~
+
+Il réside encore certains problèmes sur l'application Esc@pad. Nous
+souhaitons notamment permettre à l'utilisateur de disposer d'archive
+d'import EDX/IMS qui contiendrait des médias. Ces médias pourraient être
+directement uploadés sur Moodle/Edx en même temps que le cours.
+
+Ce qui se faisait précédemment était que les médias étaient stockés sur
+le serveur Esc@pad et les cours Moodle/Edx accédaient à ces médias
+depuis l'instance Esc@pad.
+
+Insérer des médias dans une archive edx
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Dans le dossier EDX, créer un dossier static et insérer ses images.
+2. Dans les fichiers HTML (dossier html) : faire référence aux images
+   avec src="/static/kata.png"
+
+   ::
+
+       <img alt="katakana" src="/static/kata.png"/>
+
+Insérer des médias dans une archive imscc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Dans le dossier IMS, créer un dossier static et insérer ses images.
+2. Dans imsmanifest.xml:
+
+   1. Pour chaque image:
+
+      ::
+
+          <resource identifier="img1" type="webcontent">
+              <file href="static/nom_image1.png"/>
+          </resource>
+
+   2. Pour chaque ressource utilisant les images : Ajouter les
+      dépendances dès qu’elles sont nécessaires.
+
+      ::
+
+          <resource href="webcontent/1-2presentation-des-deux-alphabets_webcontent.html" type="webcontent" identifier="doc_0_1">
+              <file href="webcontent/1-2presentation-des-deux-alphabets_webcontent.html"/>
+              <dependency identifierref="img1"/>
+              <dependency identifierref="img2"/>
+
+          </resource>
+
+3. Dans les fichiers html (dossier webcontent), faire référence avec
+   src= "../static/image.png"
+
+   ::
+
+       <img alt="hiragana" src="../static/hira.gif"/>
+
+Piste de code pour EDX
+~~~~~~~~~~~~~~~~~~~~~~
+
+1. Copier les images dans un dossier static.
+
+2. Modifier absolutizeMediaLinks / Créer relativeEDXMediaLinks Afin de
+   pouvoir effectuer le toHTML correctement ?
+
+Piste de code pour IMSCC
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Copier les médias dans un dossier static.
+
+2. Créer fonction similaire a parseVideoLinks dans la classe cours
+   (model.py). Celle-ci créerait un dictionnaire de données pour chaque
+   média, on leur associerait des identifiants « mediaX ».
+
+3. Pour chaque image, on va créer une balise dans manifest.xml de la
+   sorte :
+
+   ::
+
+       <resource identifier="img1" type="webcontent">
+       <file href="static/nom_image1.png"/>
+       </resource>
+
+4. Pour chaque fichier, on recherchera les médias qui leurs sont
+   associés, et on créerait dans le fichier manifest.xml les dépendances
+   dans le fichier en question :
+
+   ::
+
+           <resource href="webcontent/1-2presentation-des-deux-alphabets_webcontent.html" type="webcontent" identifier="doc_0_1">
+               <file href="webcontent/1-2presentation-des-deux-alphabets_webcontent.html"/>
+               <dependency identifierref="img1"/>
+               <dependency identifierref="img2"/>
+
+           </resource>
+
+5. Modifier absolutizeMediaLinks/ Créer relativeIMSMediaLinks Afin de
+   pouvoir effectuer le toHTML() correctement ?

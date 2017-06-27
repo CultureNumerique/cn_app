@@ -1,0 +1,15 @@
+language : python
+
+before_script :
+  - virtualenv ../cnappenv
+  - source ../cnappenv/bin/activate
+  - pip install -r requirements.txt
+  - pip install -e git://github.com/mtommasi/pygiftparser#egg=pygiftparser
+
+
+script :
+  - cd tests
+  - pytest --cov=src
+
+after_success:
+  - coveralls

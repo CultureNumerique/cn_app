@@ -1,0 +1,22 @@
+{% extends "app.html" %}
+
+{% block content %}
+  <h1>Ajouter un nouvel utilisateur</h1>
+
+  {% if error %}
+  <p><strong>Erreur lors de l'inscription</strong></p>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+  Vous êtes connecté, {{ user.username }} !
+  {% else %}
+
+
+  <form method="post" action="{% url 'inscription' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Valider" />
+  </form>
+  {% endif %}
+
+{% endblock %}

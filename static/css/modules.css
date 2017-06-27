@@ -307,6 +307,16 @@ span.sec-title{
 	margin-left: -1.4em;
 }
 
+.global_feedback {
+	background-color : #F3F3F3;
+	padding-left : 10px;
+}
+
+.global_feedback h1 {
+	font-size : 22px;
+	text-decoration: underline;
+}
+
 .global_feedback h2{
 	margin-left: 0px!important;
 }
@@ -327,13 +337,18 @@ span.sec-title{
     list-style: none;
 }
 
-.right_answer {
+.question li > p {
+	display: inline;
+}
+
+.right_answer p{
     font-weight: bold;
     color: green;
 }
 
 .wrong_answer {
-    text-decoration: line-through;
+	font-size : 14px;
+	font-style : italic;
 }
 
 .question ul > li > input{
@@ -416,7 +431,7 @@ iframe{
 }
 .icon-plus-circled{
 	position: absolute;
-	margin-top: 170px;
+	margin-top: 200px;
 	z-index: 1;
 }
 .teaser{

@@ -1,0 +1,54 @@
+<!-- Template for listing the user's course -->
+
+{% extends "app.html" %}
+
+{%  load static %}
+
+{% block content %}
+  <h2>Dépôts de {{ user }}</h2>
+
+  {% if user.is_authenticated %}
+
+    <table>
+      <tr>
+        <th>Repository</th>
+        <th>Git user</th>
+        <th>Feedback</th>
+        <th>Build&Zip</th>
+        <th>Build Site</th>
+        <th>Visit Site</th>
+        <th>Delete Repo</th>
+
+      </tr>
+    {% for repo in repositories.all %}
+      <tr>
+        <td><a href="{% url 'repository' repo.slug %}">{{ repo.git_name }}</a></td>
+        <td>{{ repo.git_username }} </td>
+        <td>{{ repo.show_feedback }} </td>
+        <td><a href="{% url 'build_zip_repo' repo.slug %}">Zip</a></td>
+        <td><a href="{% url 'build_repo' repo.slug %}">Build</a></td>
+        <td><a href="{% url 'visit_site' repo.slug %}">Visit</a></td>
+        <td><a href="{% url 'delete_repository' repo.slug %}">Delete</a></td>
+      </tr>
+    {% endfor %}
+    </table>
+
+
+    <br>
+
+    <form action="{% url 'my_repositories' %}" method="post"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset id="home">
+          <legend>Ajouter un dépôt</legend>
+          {{ form.as_p}}
+        </fieldset>
+
+        <input type="submit" value="Ajouter" />
+
+    </form>
+
+  {% else %}
+  <p> Vous n'êtes pas censé avoir accès à cette page, veuillez vous connecter !</p>
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,27 @@
+<!-- Connexion Template -->
+
+{% extends "app.html" %}
+
+{% block content %}
+  <h1>Se connecter</h1>
+
+  {% if error %}
+  <p><strong>Utilisateur inconnu ou mauvais de mot de passe.</strong></p>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+  Vous êtes connecté, {{ user.username }} !
+  {% else %}
+  <form method="post" action="{% url "connexion" %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Se connecter" />
+  </form>
+
+  <p> Pas de compte ? <a href="{% url 'inscription' %}"><button>Inscription</button></a> </p>
+  <p> Changer mot de passe ? <a href="{% url 'change_password' %}"><button>Changer le mot de passe</button></a> </p>
+  <p> Mot de passe oublié ? <a href="{% url 'password_reset' %}"><button>Réinitialiser le mot de passe</button></a> </p>
+
+  {% endif %}
+
+{% endblock %}
