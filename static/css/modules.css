@@ -367,7 +367,7 @@ section:before {
 }
 
 iframe{
-	border: solid 3px #DCDEDE;
+    border: solid 3px #DCDEDE;
     width: 480px;
     height:270px;
 }
@@ -376,6 +376,7 @@ iframe{
     width:100%;
     float: left;
     border: 3px solid #dcdede;
+    border-radius: 3px;
 }
 
 .play-button {
