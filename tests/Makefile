@@ -1,9 +1,9 @@
 all :
-	python model_tests.py
-	python edx_tests.py
+	python model_test.py
+	python edx_test.py
 	python ims_test.py
-	python html_test.py
-
+	python utils_test.py
+	python cnexport_test.py
 
 clean : all
 	rm -r testEDX

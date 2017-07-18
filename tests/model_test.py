@@ -1,27 +1,27 @@
  #!/usr/bin/ python
 # -*- coding: utf-8 -*-
 
-from io import open
 import json
 import mock
-from bs4 import BeautifulSoup
 import unittest
 from collections import namedtuple
 from StringIO import StringIO
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
+import sys
+import os
+import logging
+
 # Path hack for getting access to src python modules
-import sys, os
 sys.path.insert(0, os.path.abspath('..'))
+from src import model, utils, fromGift, toEDX
 
 # Ignore Warning
-import logging
 logger = logging.getLogger()
 logger.setLevel(40)
 
-from src import model, utils, fromGift, toEDX
 
-BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
+# BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+# TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
 
 """
     Test File for Project Esc@pad : Model.py
@@ -39,10 +39,9 @@ TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
 
 """
 
+
 class FctParserTestCase(unittest.TestCase):
 
-    # def JSON_string_header(author, base_url, css, language, menutitle, module, title):
-    #     return ("{'author': '"+author+"', 'base_url': '"+base_url+"', 'css':'"+css+"', 'language': '"+language+"','menutitle': '"+menutitle+"','module': '"+module+"','title': '"+title+"' }")
 
     def test_default_parser_head(self):
         """
@@ -60,7 +59,8 @@ class FctParserTestCase(unittest.TestCase):
         "title": "Titre long"
         }
         """)
-        control_header = json.load(object_header, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        control_header = json.load(object_header,
+                                   object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del object_header
 
         # Parsed MD without header
@@ -68,17 +68,32 @@ class FctParserTestCase(unittest.TestCase):
         # Titre 1
         """)
         sample_object = model.Module(pars_head, "culnu", "http://culnu.fr")
-        sample_header = json.loads(sample_object.toJson(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        sample_header = json.loads(sample_object.toJson(),
+                                   object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del sample_object
 
-        #Test the default value of metadata
-        self.assertEqual(control_header.title, sample_header.title, "Not the same title in default_parser_head")
-        self.assertEqual(control_header.author, sample_header.author, "Not the same author in default_parser_head")
-        self.assertEqual(control_header.base_url, sample_header.base_url, "Not the same base_url in default_parser_head")
-        self.assertEqual(control_header.css, sample_header.css, "Not the same css in default_parser_head")
-        self.assertEqual(control_header.language, sample_header.language, "Not the same language in default_parser_head")
-        self.assertEqual(control_header.menutitle, sample_header.menutitle, "Not the same menutitle in default_parser_head")
-        self.assertEqual(control_header.module, sample_header.module, "Not the same module in default_parser_head")
+        # Test the default value of metadata
+        self.assertEqual(control_header.title,
+                         sample_header.title,
+                         "Not the same title in default_parser_head")
+        self.assertEqual(control_header.author,
+                         sample_header.author,
+                         "Not the same author in default_parser_head")
+        self.assertEqual(control_header.base_url,
+                         sample_header.base_url,
+                         "Not the same base_url in default_parser_head")
+        self.assertEqual(control_header.css,
+                         sample_header.css,
+                         "Not the same css in default_parser_head")
+        self.assertEqual(control_header.language,
+                         sample_header.language,
+                         "Not the same language in default_parser_head")
+        self.assertEqual(control_header.menutitle,
+                         sample_header.menutitle,
+                         "Not the same menutitle in default_parser_head")
+        self.assertEqual(control_header.module,
+                         sample_header.module,
+                         "Not the same module in default_parser_head")
         print("[FctParserTestCase]-- default_parser_head OK --")
 
     def test_wrong_case_header(self):
@@ -93,9 +108,9 @@ CHICKEN: Cot Cot
 # Titre 1
         """)
         sample_object = model.Module(pars_head, "culnu", "http://culnu.fr")
-        sample_header = json.loads(sample_object.toJson(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        sample_header = json.loads(sample_object.toJson(),
+                                   object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del sample_object
-
 
         self.assertIsNotNone(sample_header.chicken)
         print("[FctParserTestCase]-- wrong_case_header OK --")
@@ -104,7 +119,7 @@ CHICKEN: Cot Cot
         """
         test parsing of sections
         """
-        #Title parsed
+        # Title parsed
         io_title = StringIO("""
 Bla bla bla
 # Title 0
@@ -121,14 +136,16 @@ Blablabla
 Fin
         """)
         sample_object = model.Module(io_title, "culnu", "http://culnu.fr")
-        sample_sections = json.loads(sample_object.toJson(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        sample_sections = json.loads(sample_object.toJson(),
+                                     object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del sample_object
 
-        self.assertEqual(len(sample_sections.sections),5, "Not the same number of sections in check_sections")
+        self.assertEqual(len(sample_sections.sections),
+                         5,
+                         "Not the same number of sections in check_sections")
 
-        for i,sec in enumerate(sample_sections.sections):
-            self.assertEqual(sec.title,"Title "+str(i))
-
+        for i, sec in enumerate(sample_sections.sections):
+            self.assertEqual(sec.title, "Title " + str(i))
 
         print("[FctParserTestCase]-- check_sections OK --")
 
@@ -150,19 +167,25 @@ Blablabla
 ## Sub 20
         """)
         sample_object = model.Module(io_sub, "culnu", "http://culnu.fr")
-        sample_subsections = json.loads(sample_object.toJson(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        sample_subsections = json.loads(sample_object.toJson(),
+                                        object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del sample_object
 
-
         # ASSERT NUMBERS
-        self.assertEqual(len(sample_subsections.sections[0].subsections), 4, "Not the same number of subsections in check_subsections")
-        self.assertEqual(len(sample_subsections.sections[1].subsections), 0, "Not the same number of subsections in check_subsections")
-        self.assertEqual(len(sample_subsections.sections[2].subsections), 1, "Not the same number of subsections in check_subsections")
+        self.assertEqual(len(sample_subsections.sections[0].subsections),
+                         4,
+                         "Not the same number of subsections in check_subsections")
+        self.assertEqual(len(sample_subsections.sections[1].subsections),
+                         0,
+                         "Not the same number of subsections in check_subsections")
+        self.assertEqual(len(sample_subsections.sections[2].subsections),
+                         1,
+                         "Not the same number of subsections in check_subsections")
 
 
-        #ASSERTSame
-        for i,sec in enumerate(sample_subsections.sections):
-            for j,sub in enumerate(sec.subsections):
+        # ASSERTSame
+        for i, sec in enumerate(sample_subsections.sections):
+            for j, sub in enumerate(sec.subsections):
                 self.assertEqual(sub.title, "Sub "+str(i)+str(j))
 
         print("[FctParserTestCase]-- check_subsections OK --")
@@ -229,23 +252,36 @@ Par contre moi oui !
         """)
 
         sample_object = model.Module(io_cours, "culnu", "http://culnu.fr")
-        sample_cours = json.loads(sample_object.toJson(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        sample_cours = json.loads(sample_object.toJson(),
+                                  object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         del sample_object
 
-
-        self.assertEqual(sample_cours.sections[0].subsections[0].title, "Cours")
-        self.assertEqual(sample_cours.sections[0].subsections[0].folder, "webcontent")
-        self.assertEqual(sample_cours.sections[0].subsections[0].src, 'Ce texte va être placé tout seul dans un cours\n')
-        self.assertEqual(sample_cours.sections[0].subsections[1].title, "Cours 0")
-        self.assertEqual(sample_cours.sections[0].subsections[1].folder, "webcontent")
-        self.assertEqual(sample_cours.sections[0].subsections[1].src, 'Ce texte va être placé dans cours 0\n### SubSub 000\nCe texte va être placé dans cours 0\n')
-        self.assertEqual(sample_cours.sections[0].subsections[2].title, "Cours 1")
-        self.assertEqual(sample_cours.sections[0].subsections[2].folder, "webcontent")
-        self.assertNotEqual(sample_cours.sections[0].subsections[3].title, "Cours")
-        self.assertNotEqual(sample_cours.sections[0].subsections[3].folder, "webcontent")
-        self.assertNotEqual(sample_cours.sections[1].subsections[0].title, "Cours")
-        self.assertNotEqual(sample_cours.sections[1].subsections[0].folder, "webcontent")
-        self.assertEqual(sample_cours.sections[1].subsections[1].title, "Cours 3")
+        self.assertEqual(sample_cours.sections[0].subsections[0].title,
+                         "Cours")
+        self.assertEqual(sample_cours.sections[0].subsections[0].folder,
+                         "webcontent")
+        self.assertEqual(sample_cours.sections[0].subsections[0].src,
+                         'Ce texte va être placé tout seul dans un cours\n')
+        self.assertEqual(sample_cours.sections[0].subsections[1].title,
+                         "Cours 0")
+        self.assertEqual(sample_cours.sections[0].subsections[1].folder,
+                         "webcontent")
+        self.assertEqual(sample_cours.sections[0].subsections[1].src,
+                         'Ce texte va être placé dans cours 0\n### SubSub 000\nCe texte va être placé dans cours 0\n')
+        self.assertEqual(sample_cours.sections[0].subsections[2].title,
+                         "Cours 1")
+        self.assertEqual(sample_cours.sections[0].subsections[2].folder,
+                         "webcontent")
+        self.assertNotEqual(sample_cours.sections[0].subsections[3].title,
+                            "Cours")
+        self.assertNotEqual(sample_cours.sections[0].subsections[3].folder,
+                            "webcontent")
+        self.assertNotEqual(sample_cours.sections[1].subsections[0].title,
+                            "Cours")
+        self.assertNotEqual(sample_cours.sections[1].subsections[0].folder,
+                            "webcontent")
+        self.assertEqual(sample_cours.sections[1].subsections[1].title,
+                         "Cours 3")
 
         print("[FctParserTestCase]-- check_cours OK --")
 
@@ -265,13 +301,16 @@ Par contre moi oui !
         testvideo = TestParseVideo()
         self.assertTrue(testvideo.parseVideoLinks())
 
-        self.assertEqual(len(testvideo.videos),1,"problem for created new video object")
-        self.assertEqual(testvideo.videos[0].get("video_title"),"MaVideo")
-        self.assertEqual(testvideo.videos[0].get("video_link"),"https://vimeo.com/0123456789")
-        self.assertEqual(testvideo.videos[0].get("video_thumbnail"),'https://i.vimeocdn.com/video/536038298_640.jpg')
+        self.assertEqual(len(testvideo.videos), 1,
+                         "problem for created new video object")
+        self.assertEqual(testvideo.videos[0].get("video_title"),
+                         "MaVideo")
+        self.assertEqual(testvideo.videos[0].get("video_link"),
+                         "https://vimeo.com/0123456789")
+        self.assertEqual(testvideo.videos[0].get("video_thumbnail"),
+                         'https://i.vimeocdn.com/video/536038298_640.jpg')
 
         print("[FctParserTestCase]-- check_video_parse_links OK --")
-
 
     def testvideoIframeList(self):
         """
@@ -294,7 +333,6 @@ Par contre moi oui !
 
         self.assertTrue('<iframe src=src_link width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>' in listevideo)
 
-
     def testSubsections(self):
         """
         Test for SubSections methods
@@ -305,13 +343,11 @@ Par contre moi oui !
         sub.title = "Title"
         sub.folder = "Folder"
         self.assertEqual(sub.section, sc)
-        self.assertEqual(sub.num,"2-1")
-        self.assertEqual(sub.getFilename(),"2-1title_Folder.html")
-        self.assertEqual(sub.getFilename(term="xml"),"2-1title_Folder.xml")
+        self.assertEqual(sub.num, "2-1")
+        self.assertEqual(sub.getFilename(), "2-1title_Folder.html")
+        self.assertEqual(sub.getFilename(term="xml"), "2-1title_Folder.xml")
 
         print("[FctParserTestCase]-- class Subsection check OK --")
-
-
 
     def testActivites(self):
         """
@@ -341,36 +377,38 @@ Je suis une AnyActivity {
 = Oui
 }
 """)
-        section = mock.MagicMock(num='1') # create Mock Object with as attribute section.num = 1
+        # create Mock Object with as attribute section.num = 1
+        section = mock.MagicMock(num='1')
 
         # ANYACTIVTY
-        inAct = model.AnyActivity(section,io_anyact)
-        self.assertEqual(inAct.src.replace('\n',''), "Je suis une AnyActivity {= Oui}")
-        self.assertEqual(inAct.lastLine,"")
-        self.assertEqual(len(inAct.questions),1)
+        inAct = model.AnyActivity(section, io_anyact)
+        self.assertEqual(inAct.src.replace('\n', ''),
+                         "Je suis une AnyActivity {= Oui}")
+        self.assertEqual(inAct.lastLine, "")
+        self.assertEqual(len(inAct.questions), 1)
 
-        #ACTIVITE
+        # ACTIVITE
         matchA = model.reStartActivity.match(io_activite.readline())
         act = model.goodActivity(matchA)
         self.assertIsNotNone(act)
         self.assertEqual(act, model.Activite)
-        self.assertIsNotNone(act(section,io_activite))
+        self.assertIsNotNone(act(section, io_activite))
 
-        #COMPREHENSION
+        # COMPREHENSION
         matchC = model.reStartActivity.match(io_compr.readline())
         comp = model.goodActivity(matchC)
         self.assertIsNotNone(comp)
         self.assertEqual(comp, model.Comprehension)
-        self.assertIsNotNone(comp(section,io_compr))
+        self.assertIsNotNone(comp(section, io_compr))
 
-        #ACTIVITEAVANCEE
+        # ACTIVITEAVANCEE
         matchAA = model.reStartActivity.match(io_actav.readline())
         actav = model.goodActivity(matchAA)
         self.assertIsNotNone(model.goodActivity(matchAA))
         self.assertEqual(model.goodActivity(matchAA), model.ActiviteAvancee)
-        self.assertIsNotNone(actav(section,io_actav))
+        self.assertIsNotNone(actav(section, io_actav))
 
-        #NOTHING
+        # NOTHING
         matchN = model.reStartActivity.match(io_rdt.readline())
         self.assertIsNone(model.goodActivity(matchN))
 
@@ -396,7 +434,8 @@ Blabla
 [Video2](https://vimeo.com/9876543210){: .cours_video }
             """)
             mod = model.Module(io_video, 'test')
-            self.assertEqual(mod.sections[0].subsections[0].videoIframeList()+'\n\n', mod.toVideoList())
+            self.assertEqual(mod.sections[0].subsections[0].videoIframeList()+'\n\n',
+                             mod.toVideoList())
 
     def testtoGift(self):
         """
@@ -424,7 +463,8 @@ ok
         gift_src = "$CATEGORY: $course$/Quiz Bank '1-1 Compréhension'"
         for q in mod.sections[0].subsections[0].questions:
             gift_src += q.source
-        self.assertEqual(gift_src.replace('\n','').strip(),mod.toGift().replace('\n','').strip())
+        self.assertEqual(gift_src.replace('\n', '').strip(),
+                         mod.toGift().replace('\n', '').strip())
 
     def testtoEdxProblemList(self):
         io_test = StringIO(u"""# Title 0
@@ -448,8 +488,8 @@ ok
         edx_list = ''
         for q in mod.sections[0].subsections[0].questions:
             edx_list += toEDX.toEdxProblemXml(q)
-        self.assertEqual(edx_list.replace('\n','').strip(),mod.sections[0].subsections[0].toEdxProblemsList().replace('\n','').strip())
-
+        self.assertEqual(edx_list.replace('\n', '').strip(),
+                         mod.sections[0].subsections[0].toEdxProblemsList().replace('\n', '').strip())
 
     def testMediaLinks(self):
         io_media = StringIO("""# Titre 1
@@ -475,8 +515,12 @@ bloublou [!image](media/monimage3.png)
         m = model.Module(io_media, 'module1')
         subsec = m.sections[0].subsections[1]
         self.assertTrue(subsec.parseMediaLinks())
-        self.assertEqual(subsec.medias[0], {'media_id': 'img1-20', 'media_name': 'monimage2.png'})
-        self.assertEqual(subsec.medias[1], {'media_id': 'img1-21', 'media_name': 'monimage3.png'})
+        self.assertEqual(subsec.medias[0],
+                         {'media_id': 'img1-20',
+                          'media_name': 'monimage2.png'})
+        self.assertEqual(subsec.medias[1],
+                         {'media_id': 'img1-21',
+                          'media_name': 'monimage3.png'})
 
     def testModuleToHtml(self):
         """
@@ -495,12 +539,12 @@ Bienvenue sur le cours
 ## Titre 22
 Fin
 """)
-        jenv = Environment(loader=FileSystemLoader(TEMPLATES_PATH))
+        jenv = Environment(loader=FileSystemLoader("."))
         jenv.filters['slugify'] = utils.cnslugify
         module = model.Module(io_html, 'module')
         module_template = jenv.get_template("module.html")
         module_html_content = module_template.render(module=module)
-        resultat= ("""<!-- Menu gauche -->
+        resultat = ("""<!-- Menu gauche -->
 <div class="menugauche navmenu navmenu-default navmenu-fixed-left offcanvas-sm" role="navigation" id="menugauche">
     <h1 class="icon-web">Titre</h1>
 
@@ -681,8 +725,6 @@ Fin
 
 </div>
 <!--Content -->""".strip() in module_html_content.strip())
-
-
 
 
 # Main
