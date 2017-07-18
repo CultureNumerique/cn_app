@@ -3,7 +3,7 @@ Template for reuploading a course into the Esc@pad application.
 We create new pad for each module, and we associate the course to the current user
 -->
 
-{% extends "app_cours.html" %}
+{% extends "app.html" %}
 
 {% block titre %}Formulaire{% endblock %}
 
@@ -31,9 +31,6 @@ We create new pad for each module, and we associate the course to the current us
 
         <input type="submit" value="Submit" />
     </form>
-
-    <a href="{% url 'mes_cours' %}"><button>Retour à mes cours</button></a>
-
 
 
 {% endblock %}

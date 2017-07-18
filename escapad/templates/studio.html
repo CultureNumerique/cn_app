@@ -1,0 +1,93 @@
+<!-- Template for listing the user's course -->
+
+{% extends "app.html" %}
+
+{%  load static %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'studio' %}"><span>Mes cours</span></a></li>
+{% endblock %}
+
+
+{% block content %}
+{% if user.is_authenticated %}
+<h1>Mes cours
+  <button type="button" class="popup" onclick="showPopUp('popup1')">
+    <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+    <span class="popuptext" id="popup1">
+      Votre liste de cours, comme autant de groupes de modules, chaque module comprenant des textes et des quizz.
+    </span>
+  </button>
+</h1>
+
+
+
+<table>
+  <tr>
+    <th>Nom du cours</th>
+    <th>Nombre de modules</th>
+    <th>Nombre de contributeurs</th>
+    <th>Suppression</th>
+  </tr>
+  {% for cours in profil.cours.all %}
+  <tr>
+    <td><a href="{% url 'cours' cours.id_cours %}">{{ cours.nom_cours }}</a></td>
+    <td>{{ cours.module_set.all.count}} Module(s) </td>
+    <td>{{ cours.profil_set.all.count }} Contributeur(s) </td>
+    <td><a href="{% url 'delete_course' cours.id_cours %}">Supprimer ce cours</a></td>
+    
+  </tr>
+  {% endfor %}
+</table>
+
+
+<h1>Créer un nouveau cours
+  <button type="button" class="popup" onclick="showPopUp('popup2')">
+    <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+    <span class="popuptext" id="popup2">
+      Un cours est un ensemble de modules et une page d'accueil.
+    </span>
+  </button>
+</h1>
+<form action="{% url 'studio' %}" method="post"  enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p}}
+  
+  <input type="submit" value="Créer" />
+  
+  
+</form>
+<div class="errors">
+  <!-- Display the errors -->
+  <ul>
+    {% for erreur in erreurs %}
+    <li>{{erreur}}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="avanced">
+  <h1>Redéposer un cours à partir d'une archive
+    <button type="button" class="popup" onclick="showPopUp('popup3')">
+      <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+      <span class="popuptext" id="popup3">
+        Veuillez sélectionner l'archive export.tar.gz fournie <br>
+        lors de la génération du site.
+      </span>
+    </button>
+  </h1>
+  <form action="{% url 'studio' %}" method="post"  enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form2.as_p}}
+    <input type="submit" value="Déposer" />
+  </form>
+</div>
+
+
+    
+
+{% else %}
+<p>Veuillez <a href="{% url 'connexion'%}">vous connecter</a> pour accéder à ces fonctionnalités</p>
+{% endif %}
+
+{% endblock %}

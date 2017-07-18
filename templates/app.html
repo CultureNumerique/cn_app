@@ -40,7 +40,7 @@ Most of the template inherits this template.
     <nav class="navbar navbar-default navbar-fixed-top" id="menutop">
        {% block nav %}
 	      <div class="navbar-header">
-	         <a class="navbar-brand" href="{% url "accueil" %}">
+	         <a class="navbar-brand" href="{% url "index" %}">
                   <img class="hidden-xs logo" src="{% static 'img/logo_plat_vert.svg' %}" alt="">
                   <img class="visible-xs logo" src="{% static 'img/logo_cercle_vert.svg' %}" alt="">
             </a>
@@ -51,20 +51,19 @@ Most of the template inherits this template.
                 <li><a>Bonjour {{ request.user.username }} </a></li>
                 <li><a href="{% url "deconnexion" %}"> Déconnexion </a></li>
               {% else %}
-                <li><a> Bonjour Visiteur :</a></li>
-                <li><a href="/connexion">Connexion </a></li>
+                <li><a href="{% url 'connexion' %}">Connexion</a></li>
+                <li><a href="{% url 'inscription' %}">Créer un compte</a></li>
               {% endif %}
-              <li><a href="{% url "admin:index" %}"> admin </a></li>
-              <li><a href="{% static 'documentation' %}"> documentation </a></li>
+              <li><a href="{% url "admin:index" %}">Administration</a></li>
+              <li><a href="{% static 'documentation' %}">Documentation</a></li>
             </ul>
 	      </div>
-
        {% endblock %}
    </nav>
 
    <section id="content2">
      <ol class="breadcrumb">
-       <li><a href="{% url 'accueil' %}"><span class="icon-home"> Accueil</span></a></li>
+       <li><a href="{% url 'index' %}"><span class="icon-home"> Accueil</span></a></li>
         {% block breadcrumb %}{% endblock %}
         <li><a href="#"></a></li>
      </ol>

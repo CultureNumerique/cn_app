@@ -1,0 +1,53 @@
+{% extends "app.html" %}
+
+{% block script %}
+{% load static %}
+<script type="text/javascript" src="{% static 'js/etherpad_process.js' %}"></script>
+<script type="text/javascript">
+  var is_home = "{{ is_home }}" == 'True';
+  var base_url = "{% url 'index' %}";
+  var url_module ="{{ url }}";
+</script>
+<script type="text/javascript" src="{% static 'js/detect_change.js' %}"></script>
+{% endblock %}
+
+{% block onload %}
+  onload="addlistener(); setValue();"
+{% endblock %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'studio' %}"><span> Mes cours</span></a></li>
+  <li><a href="{% url 'cours' cours.id_cours %}"><span> {{ cours.nom_cours }} </span></a></li>
+  <li><a href="{% url 'module' cours.id_cours url %}"><span> Module {{ name }}</span></a></li>
+{% endblock %}
+
+{% block content %}
+
+    <h2>Module {{ name }}</h2>
+
+    <div class="container">
+      <div class="row">
+        <!-- Button row -->
+        <div class="col-md-5">
+          <input type="button" value="Afficher/Masquer l'aperçu" onclick="afficher_apercu()">
+          <a href="{% url 'help' %}">Aide</a>
+        </div>
+        <div class="col-md-5">
+          <input type="checkbox" id="feedback" value="feedback" onclick="setValue()">
+          Afficher le feedback
+          <br>
+        </div>
+      </div>
+      
+      <!-- IFrame row-->
+      <div class="row">
+        <div id="col-framehome" class="col-md-5">
+          <iframe id="framehome" name="framehome" src="{{ full_url }}" width="100%" height="500px"></iframe>
+        </div>
+        <div id="col-frametest" class="col-md-5">
+          <iframe id="frametest" name="frametest" src="" width="100%" height="500px"></iframe>
+        </div>
+      </div>
+    </div>
+    
+{% endblock %}

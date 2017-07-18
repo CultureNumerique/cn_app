@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 
 # Register your models here.
-from .models import Repository
+from .models import Repository, Profil, Module, Cours
 from .forms import RepositoryForm
 
 
@@ -79,3 +79,9 @@ class RepositoryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Repository, RepositoryAdmin)
+
+admin.site.register(Profil)
+
+admin.site.register(Module)
+
+admin.site.register(Cours)

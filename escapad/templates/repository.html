@@ -1,6 +1,6 @@
 <!-- Template for listing the user's course -->
 
-{% extends "app_depot.html" %}
+{% extends "app.html" %}
 
 {%  load static %}
 
@@ -50,8 +50,6 @@
         <input type="submit" value="Modifier" />
 
     </form>
-
-    <a href="{% url 'my_repositories' %}"><button>Retour à mes dépôts</button></a>
 
   {% else %}
   <p> Vous n'êtes pas censé avoir accès à cette page, veuillez vous connecter !</p>

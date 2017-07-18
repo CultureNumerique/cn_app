@@ -1,0 +1,136 @@
+
+{% extends "app.html" %}
+
+{%  load static %}
+
+{% if userFound %}
+  <p> Partage du projet effectué avec succès ! </p>
+{% endif %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'studio' %}"><span>Mes cours</span></a></li>
+  <li><a href="{% url 'cours' cours.id_cours %}"><span> {{ cours.nom_cours }} </span></a></li>
+{% endblock %}
+
+{% block content %}
+
+  {% if user.is_authenticated %}
+
+    <h1>Cours : {{ cours.nom_cours }}</h1>
+
+    <h2>Modules</h2>
+    <table>
+      <tr>
+	<th>{{ cours.module_set.all.count }} Module(s) </th>
+        <th>Suppression</th>
+      </tr>
+      {% for module in cours.module_set.all %}
+      <tr>
+        <td><a href="{% url 'module' cours.id_cours module.url %}"> {{ module.nom_module }}</a>
+	</td>
+        <td><a href="{% url 'delete_module' cours.id_cours module.url %}">Supprimer</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    <form action="{% url 'cours' cours.id_cours %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+	<tr>
+          <td>{{ form_new_module.as_p}}</td>
+          <td><input type="submit" value="Ajouter un module" /></td>
+          <td>
+            <button type="button" class="popup" onclick="showPopUp('popup3')">
+              <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+              <span class="popuptext" id="popup3">
+                Générer un nouveau module pour ce cours:<br/>
+                Créé un nouveau pad collaboratif.
+              </span>
+            </button>
+          </td>
+        </tr>
+      </table>
+      <input type="hidden" name="id_form" value="0">
+    </form>
+	
+
+    <h2>Exporter ce cours
+      <button type="button" class="popup" onclick="showPopUp('popup2')">
+        <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+        <span class="popuptext" id="popup2">
+	  Construire une archive contenant les modules et des exports pour un site web, Moodle et EDX.
+        </span>
+      </button>
+    </h2>
+    <form action="{% url 'cours' cours.id_cours %}" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+	<tr>
+	  <th>Page d'accueil</th>
+          <td><a href="{% url 'module' cours.id_cours cours.url_home %}">Modifier la page d'accueil</a>
+       
+	  </td>
+	</tr>
+	{{ form_generate.as_table }}
+      </table>
+      <input type="hidden" name="id_form" value="2">
+      <input type="submit" value="Générer l'archive" />
+      <button type="button" class="popup" onclick="showPopUp('popup4')">
+	<img src="{% static 'img/help.png' %}" height="20" width="20"/>
+	<span class="popuptext" id="popup4">
+	Ajoutez une page d'accueil, précisez un logo et ajoutez éventuellement des médias référencés dans les modules (Par exemple, si le module1 contient <code>![illustration](media/image.png)</code>)
+	<br />
+	<br />
+	Architecture de l'archive medias :<br>
+	<pre style="margin-right: 1em;">
+	  module1
+	  |-- image.png
+	  |-- ...
+	  module2
+	  |-- ...
+	  ...
+	</pre>
+        Pour chaque module, créer un dossier moduleX (module1,
+        module2...)<br>  Insérer ces médias à l'intérieur en
+        fonction de leurs apparitions dans les modules.
+      </span>
+      </button>
+
+
+    </form>
+
+
+    <h2>Contributeurs</h2>
+    <table>
+      {% for profil in cours.profil_set.all %}
+      <tr>
+	<td>
+          {{ profil.user.username }}
+	</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <form action="{% url 'cours' cours.id_cours %}" method="post"  enctype="multipart/form-data">
+      <table>
+        {% csrf_token %}
+	<tr>
+          <td>{{ form_add_user.as_p}} </td>
+          <td><input type="submit" value="Ajouter un contributeur"/></td>
+          <td>
+            <button type="button" class="popup" onclick="showPopUp('popup1')">
+              <img src="{% static 'img/help.png' %}" height="20" width="20"/>
+              <span class="popuptext" id="popup1">Veuillez entrer un nom d'utilisateur valide
+		pour partager le cours avec celui-ci.
+		<br>(Note: Il deviendra aussi propriétaire du cours et travaillera sur la même copie.)
+              </span>
+            </button>
+	    <input type="hidden" name="id_form" value="1">
+          </td>
+	</tr>
+      </table>
+    </form>
+
+  {% else %}
+  <p> Vous n'êtes pas censé avoir accès à cette page, veuillez vous connecter !</p>
+  {% endif %}
+
+{% endblock %}

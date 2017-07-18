@@ -1,0 +1,87 @@
+
+
+{% extends "app.html" %}
+
+{% block titre %}Bienvenue sur Esc@pad{% endblock %}
+
+{% block script %}
+
+{%  load static %}
+
+{% endblock %}
+
+{% block content %}
+
+<h1>Esc@pad</h1>
+
+
+<h2>Édition Simple de Cours en ligne sur Plateforme à Accès Distribué</h2>
+
+<p>Créez vos cours à partir de simples textes et générez automatiquement un site web et des paquets pour une intégration dans Moodle ou Edx.</p>
+<blockquote>
+<dl>
+  <dt><a href="{% url 'form_upload' %}"><button>Créez vos cours</button></a></dt>
+  <dd>Créez un cours à partir de vos documents sur votre machine. Aucune donnée n'est conservée.</dd>
+  <dt><a href="{% url 'studio' %}"><button>Studio de conception</button></a></dt>
+  <dd>Créez un compte et bénéficiez de possibilités supplémentaires. Créez un cours de façon collaborative à l'aide d'un éditeur intégré.</dd>
+  <dt><a href="{% url 'my_repositories' %}"><button>Liaison Git</button></a></dt>
+  <dd>Votre compte permet également de créer un cours à partir de ressources stockées dans un référentiel Git.</dd>
+</dl>
+</blockquote>
+<h2>En savoir plus</h2>
+<blockquote>
+  <p><code>Esc@pad</code> a été imaginée par des enseignants qui développent des cours sur des plateformes d'enseignement en ligne (LMS), telles que Moodle ou EDX. <code>Esc@pad</code> a pour objectifs de</p> 
+
+  <ul>
+  <li>Simplifier la mise en forme, la modification des cours et des quizz, indépendamment du canal de diffusion choisi: Moodle, EDX ou un simple site web.</li>
+
+  <li>Offrir le moyen d'une édition collaborative des contenus.</li>
+  </ul>
+
+  <p>La plateforme est entièrement mise à disposition de la communauté
+  éducative, en libre d'accès et le projet est disponible sur Github
+  sous licence CC.</p>
+
+  <p>En utilisant le format <code>Markdown</code> pour structurer les contenus de cours et le format <code>gift</code>
+    pour décrire les exercices, nous proposons d'écrire l'ensemble du cours à l'extérieur des LMS à l'aide
+    d'un simple éditeur de texte. <code>Esc@pad</code> se charge alors de générer  un simple site internet et les archives pour l'une ou l'autre des plateforme de e-learning.</p>
+</blockquote>
+
+<h3>Éditer et visualiser</h3>
+
+<p>En vous connectant, <strong>éditez</strong> vos cours et vos quizz,
+et <strong>générez une archive</strong> contenant une
+version <strong>html</strong>, une archive <strong>Moodle</strong>, et
+une archive <strong>EdX</strong> prêtes à être importées sur ces 2
+LMS.</p>
+
+<h3>Collaborer</h3>
+
+<p><strong>Partagez</strong> vos cours avec d'autres utilisateurs
+  enregistrés sur <code>esc@pad</code>, ceux-ci y auront accès de la
+  même façon et pourront <strong>collaborer en direct</strong> dans un
+  éditeur collaboratif.</p>
+
+<h3>Stockage en ligne</h3>
+
+<p>La plateforme <strong>conserve vos cours et vos quizz</strong>,
+  vous les retrouvez à chaque connexion. Aucune sauvegarde n'est
+  nécessaire, <code>esc@pad</code> s'en charge de manière automatique.
+  Seuls vos visuels (formats <code>gif</code>, <code>jpg</code>
+  ou <code>png</code>) doivent être conservés sur votre disque
+  dur.</p>
+
+<p>Pour les utilisateurs avancés, une alternative vous permet de
+conserver vos ressources dans un référentiel <code>git</code> (github,
+framagit,...).</p>
+
+<h3>Pas besoin d'éditeur en ligne ?</h3>
+
+<p>Vous préférez travailler avec <strong>votre propre éditeur</strong>
+  sur votre poste de travail, aucun souci, vous pouvez quand même
+  bénéficier d'<code>escapad</code>.  Il n'est alors pas nécessaire de
+  se connecter, vous <strong>uploadez</strong> votre cours et vos
+  media et vous récupérez <strong>la même archive</strong> avec le
+  site web, la version Moodle et la version Edx.</p>
+
+{% endblock %}

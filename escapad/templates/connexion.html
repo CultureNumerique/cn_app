@@ -1,0 +1,35 @@
+{% extends "app.html" %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'connexion' %}"><span> Connexion</span></a></li>
+{% endblock %}
+
+{% block content %}
+  <h1>Se connecter</h1>
+
+  {% if error %}
+  <div class="error">
+    <p><strong>Utilisateur inconnu ou mauvais de mot de passe.</strong></p>
+  </div>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+  Vous êtes connecté {{ user.username }} !
+  {% else %}
+  <form method="post" action="{% url "connexion" %}">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+    </table>
+    <input type="submit" value="Se connecter" />
+  </form>
+
+  <div id="otherLoginActions">
+    <a href="{% url 'inscription' %}"><button>Inscription</button></a>
+    <a href="{% url 'change_password' %}"><button>Changer de mot de passe</button></a>
+    <a href="{% url 'password_reset' %}"><button>Mot de passe oublié</button></a>
+  </div>
+
+  {% endif %}
+
+{% endblock %}

@@ -1,61 +1,12 @@
+{% extends "app.html" %}
 
-<!--
-Preview Template
-Use jquery to keep the scroll when refreshing the page (we often refresh the preview when we edit the course)
--->
+{% block titre %}Aide rapide d'Esc@pad{% endblock %}
 
+{% block breadcrumb %}
+  <li><span>Aide</span></li>
+{% endblock %}
 
-<!DOCTYPE html>
-
-<html lang="fr" >
-
-<head>
-    {%  load static %}
-
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/jasny-bootstrap.min.css' %}" rel="stylesheet" media="screen">
-    <!-- onepage css -->
-    <link href="{% static 'css/modules.css' %}" rel="stylesheet">
-
-    <!-- Icones -->
-    <link href="{% static 'css/icons.css' %}" rel="stylesheet">
-    <link href="{% static 'css/common.css' %}" rel="stylesheet">
-
-	<meta charset="UTF-8">
-
-
-    <script type="text/javascript" src="{% static 'js/process_preview.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery/jquery.min.js' %}"></script>
-    <script type="text/javascript">
-
-    // Keep the actual scroll when refreshing the page
-    $(window).scroll(function() {
-      sessionStorage.scrollTop = $(this).scrollTop();
-    });
-
-    $(document).ready(function() {
-      if (sessionStorage.scrollTop != "undefined") {
-        $(window).scrollTop(sessionStorage.scrollTop);
-      }
-    });
-
-    </script>
-
-
-    <style>
-      body {
-        padding-left: 50px;
-      }
-    </style>
-</head>
-
-<body onload="process()">
-
-
-  <!-- Display the content below -->
-
-
-<!-- Section 1 -->
+{% block content %}
 
 
 <h1> 1. Avant-Propos </h1>
@@ -1376,7 +1327,6 @@ Texte de la question
  Vous avez maintenant tout les outils nécessaires pour vous lancer dans votre propre cours !
 </p>
 
+{% endblock %}
 
 
-</body>
-</html>
