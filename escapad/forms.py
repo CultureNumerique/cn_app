@@ -69,19 +69,24 @@ class SearchUser(forms.Form):
         return self.cleaned_data['user']
 
 
-class UploadForm(forms.Form):
-    nom_cours = forms.CharField(label=_("Nom du cours"), max_length=100)
+class CourseProgram(forms.Form):
+    courseTitle = forms.CharField(label=_("Nom du cours"), max_length=100)
+
+
+class CourseOptions(forms.Form):
     logo = forms.ImageField(required=False)
-    home = forms.FileField(label=_("Page d'accueil"))
+    home = forms.FileField(label=_("Page d'accueil"), required=False)
+    siteTemplate = forms.FileField(label="Modèle de site", required=False)
+    moduleTemplate = forms.FileField(label="Modèle de module", required=False)
     feedback = forms.BooleanField(required=False)
 
 
-class ModuleForm(forms.Form):
+class CourseModule(forms.Form):
     module_1 = forms.FileField()
     media_1 = forms.FileField(required=False)
 
 
-class UploadFormLight(forms.Form):
+class CourseFromArchive(forms.Form):
     archive = forms.FileField()
     feedback = forms.BooleanField(required=False)
 
@@ -117,6 +122,8 @@ class UploadFormEth(forms.Form):
 class GenerateCourseForm(forms.Form):
     logo = forms.ImageField(required=False)
     medias = forms.FileField(required=False)
+    siteTemplate = forms.FileField(required=False)
+    moduleTemplate = forms.FileField(required=False)
     feedback = forms.BooleanField(required=False)
 
     # check if the archive is a tar.gz archive

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="/static/image/png" href="img/favicon.ico" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    {% if body_class == 'home' %}<link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>{% endif %}
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/jasny-bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- onepage css -->
+    {% if body_class == 'home' %}
+    <link href="static/css/onepage.css" rel="stylesheet">
+    {% elif body_class == 'modules' %}
+    <link href="static/css/modules.css" rel="stylesheet">
+    {% endif %}
+    <!-- Icones -->
+    <link href="static/css/icons.css" rel="stylesheet">
+    <link href="static/css/common.css" rel="stylesheet">
+    <title>{{ course.title }}</title>
+</head>
+
+<body class={{ body_class }} data-spy="scroll" {% if body_class == 'home' %}data-target="#header" data-offset="120"{%elif body_class== 'modules'%}data-target="#menugauche" data-offset="120"{% endif %}>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top" id="menutop">
+        <div class="">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Activer navigation principale</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">
+                  {% if logo == 'default'%}
+                      <img class="hidden-xs logo" class="logo" src="static/img/logo_plat_vert.svg" alt="">
+                  {% else %}
+                      <img class="hidden-xs logo" class="logo" src="{{logo}}" alt="">
+                  {% endif %}
+                  <img class="visible-xs logo" src="static/img/logo_cercle_vert.svg" alt="">
+                </a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="">
+                        <a href="index.html">
+                            <img src="static/img/home.svg" style="width:1.8em; height:1.8em; padding-right:0.5em; margin-top:-0.25em;">Présentation</a>
+                    </li>
+                    <li>
+                        <a href="index.html#page7">
+                            <img src="static/img/contact.svg" style="width:2.5em; height:2.5em; padding-right:0.5em; margin-top:-0.60em; margin-bottom:-0.5em;">Contact</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="static/img/modules.svg" style="width:3.5em; height:3.5em; padding-right:0.5em; margin-top:-0.90em; margin-bottom:-10px;">Modules
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for module in course.modules %}
+                            <li class="btnmodules {{module.class}}">
+                                <a href="{{ module.module }}.html">{{module.menutitle}}</a>
+                                <!-- <p class="subbtnmodules">{{module.title}}</p> -->
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+    <!-- end of fixed top navbar -->
+
+    <!-- Début Menu One page / header -->
+    <div id="header" class="navbar navbar-fixed-top offcanvas-sm">
+      <div class="">
+	<div class="collapse navbar-collapse" id="exCollapsingNavbar">
+	  <ul class="nav">
+	    <li><a href="#page2">Culture numérique, culture citoyenne</a></li>
+	    <li><a href="#page3">Le pari d’une formation active</a></li>
+	    <li><a href="#page4">Motivations</a></li>
+	    <li><a href="#page5">Réutilisabilité</a></li>
+	    <li><a href="#page6">Modules</a></li>
+	    <li><a href="#page7">Contacts</a></li>
+	  </ul>
+	</div>
+      </div>
+    </div>
+
+    <!-- Fin Menu One page / header -->
+    
+    <!-- <nav class="navbar navbar-light bg-faded"> -->
+    
+    <!-- <nav class="sidemenu visible-xs">
+	 <button class="btn-sidemenu btn-sidemenu-primary collapsed" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar" aria-expanded="false" aria-controls="navbar">
+	   <span class="sr-only">Activer navigation secondaire</span>
+	   <span class="glyphicon glyphicon-chevron-left"></span>
+	 </button>
+    </nav> -->
+    
+    <!-- Fin Menu One page / header -->
+
+    <!-- -------------------------------------------------------------------- -->
+    
+    <!-- Début page 1 -->
+
+    <div id="page1" class="page section-odd container-fluid">
+      <div class="row text-center">
+	<div class="col-md-12">
+	  <img src="static/img/maintitle.svg" align="center">
+	</div>
+      </div>
+      
+    </div>
+    
+    <!-- Fin page 1 -->
+    <!-- Début page 2 -->
+    
+    <div id="page2" class="page section-even container-fluid">
+      <div class="row">
+	<div class="col-md-7">
+	  <h1>Culture numérique, <br /> culture citoyenne</h1>
+	  <p>
+	    <strong>Notre objectif :</strong> <br />
+	    Proposer des contenus qui permettent de
+	    <strong>comprendre</strong> et
+	    <strong>analyser les défis et les enjeux</strong> liés au monde numérique dans lequel nous vivons.</p>
+	  <p>
+	    Notre démarche repose sur 2 grands principes :
+	    <br>
+	    <strong>
+	      <p class="orange">- Le numérique ne se limite pas aux usages
+		<br> - Ce qui est hors des usages n’est pas réservé aux informaticiens
+		<br>
+	    </strong>
+	  </p>
+	  <p>
+	    Nous proposons une découverte de la culture numérique à travers différentes approches (historiques, sociologiques, économique, …). Les aspects technologiques ne sont jamais gratuits mais répondent toujours à la nécessaire compréhension de concepts pour
+	    appréhender des questions plus générales.
+	</div>
+	<div class="col-md-5 text-center">
+	  <img src="static/img/citoyen.svg">
+	</div>
+      </div>
+      
+    </div>
+
+    <!-- Fin page 2 -->
+    <!-- Début page 3 -->
+    
+    <div id="page3" class="page section-odd container-fluid">
+      <div class="row">
+	<div class="col-md-12">
+	  <h1>Le pari d’une formation active.</h1>
+	</div>
+      </div>
+      <div class="row">
+	<div class="col-md-12">
+	  Afin de rendre les apprenants actifs et responsables face au numérique, la formation mixe une approche classique diffusion de contenu + évaluation des connaissances acquises et une découverte autonome des savoirs.
+	  <br>
+	  <br> Les ressources proposées sont donc de 3 types.
+	</div>
+      </div>
+      <div class="row text-center">
+	<div class="col-md-4">
+	  <img src="static/img/page3_icon1.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#cours" class="btn-odd btn-odd-primary btn-lg">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="cours" class="collapse panel panel-odd">
+	    Les supports de cours peuvent prendre différentes formes. Découpés en grains très fins, ils peuvent être sous forme de vidéos/animation avec une forte plus-value pédagogique ou simplement sous la forme d’un texte ou de liens à explorer ( ressources vidéos
+	    externes, podcast audio, sites d’information, …)
+	  </div>
+	</div>
+	<div class="col-md-4">
+	  <img src="static/img/page3_icon2.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#quizz" class="btn-odd btn-odd-primary btn-lg text-center">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="quizz" class="collapse panel panel-odd">
+	    Les quizz d’auto-évaluation destinés à permettre aux apprenants de vérifier que les contenus ont été assimilés et compris. Ils sont en général très simple si le cours a été vu.
+	  </div>
+	</div>
+	<div class="col-md-4">
+	  <img src="static/img/page3_icon3.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#exos" class="btn-odd btn-odd-primary btn-lg text-center">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="exos" class="collapse panel panel-odd">
+	    Une grosse partie des connaissances est dispensée sous forme de recherches guidées. Elles visent à positionner l’apprenant dans une démarche active. Ces recherches sont le plus souvent terminées par des questions ouvertes qui ont pour but de faire réfléchir
+	    et prendre du recul face aux connaissances abordées.
+	  </div>
+	</div>
+      </div>
+    </div>
+    
+    <!-- Fin page 3 -->
+    <!-- Début page 4 -->
+    
+    <div id="page4" class="page section-even container-fluid">
+      <div class="row">
+	<div class="col-md-12">
+	  <h1>Motivations</h1>
+	  <p>Ce projet est une initiative d’enseignants de l’Université de Lille3 qui ont voulu proposer des contenus de formations à la culture numérique à tous les étudiants du cycle Licence de leur université de Sciences Humaines et Sociales.</p>
+	  <br>
+	</div>
+      </div>
+      <div class="row">
+	<div class="col-md-2">
+	  <img src="static/img/use.svg">
+	</div>
+	<div class="col-md-4">
+	  <strong>
+	    <span class="page4title">Des usages plus efficaces</span>
+	  </strong>
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#usages" class="btn-even btn-even-primary btn-lg text-center">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="usages" class="collapse panel-even">
+	    Contrairement à ce qu’ont pu croire certains, les nouvelles générations ne sont pas beaucoup plus à l’aise avec le numérique que les précédentes. Si la technologie ne fait plus peur, elle est rarement utilisée de manière efficace. Nous constatons que
+	    les étudiants ne comprennent pas ce qu’ils font, ne savent pas comment fonctionnent les machines ultrapuissantes qui sont dans leurs poches, et passent très souvent à côté des opportunités qu’offrent le numérique. Les pratiques restent basiques, dirigées
+	    par les interfaces et rendent les individus prisonniers d’applications ou de logiciels.
+	  </div>
+	</div>
+	<div class="col-md-2">
+	  <img src="static/img/logoc2i.svg">
+	</div>
+	<div class="col-md-4">
+	  <strong>
+	    <span class="page4title">Complémentarité avec le C2i</span>
+	  </strong>
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#c2i" class="btn-even btn-even-primary btn-lg text-center">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="c2i" class="collapse panel-even">
+	    Le C2i vise à délivrer un certificat de compétences. Bien que les thèmes abordés soient proches, notre démarche est différente. En effet, nous n’abordons pas les sujets par les usages et la manipulation, mais par la compréhension des concepts. Les connaissances
+	    acquises permettent alors d’aborder les manipulations avec plus de recul et conduisent à des usages plus responsables. Le C2i et les modules de culture numérique sont donc complémentaires.
+	  </div>
+	</div>
+      </div>
+    </div>
+    <!-- Fin page 4 -->
+    <!-- Début page 5 -->
+    
+    <div id="page5" class="page section-odd container-fluid">
+      <div class="row">
+	<div class="col-md-12">
+	  <h1>Réutilisabilité</h1>
+	  Afin de faciliter la réappropriation des contenus par tous les types d’enseignants/formateurs, nous respectons 3 règles fondamentales :
+	  <br>
+	  <br>
+	</div>
+      </div>
+      
+      <div class="row text-center">
+	<div class="col-md-4">
+	  <strong>Une granularité fine</strong>
+	  <br>
+	  <img src="static/img/granularite.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#granularite" class="btn-odd btn-odd-primary btn-lg">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="granularite" class="collapse panel-odd">
+	    Les ressources sont regroupées en modules thématiques, et les modules sont découpés en plusieurs sections. Ce découpage très fin permet à chaque enseignant de ne reprendre qu’une partie des sections ou de séparer les contenus, les exercices d’auto-évaluation
+	    et les recherches d’approfondissment pour adapter sa pédagogie selon l’âge et le type de public concerné.
+	  </div>
+	</div>
+	
+	<div class="col-md-4">
+	  <strong>Des formats simples et ouverts</strong>
+	  <br>
+	  <img src="static/img/format_ouvert.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#formats" class="btn-odd btn-odd-primary btn-lg">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="formats" class="collapse panel-odd">
+	    Nous avons choisi de décrire toutes les ressources sous un format texte, ce qui facilite l’interopérabilité et la réutilisabilité. Aucun logiciel spécifique n’est nécessaire pour utiliser les ressources ou en créer de nouvelles. La version html présentée
+	    sur ce site est directement utilisable par chacun sans autre besoin qu’un navigateur internet. Une procédure d’export vers le format normalisés du LMS (Learning Management System) Moodle (format IMSCC) permet pour ceux qui le désirent de créer facilement
+	    un cours Moodle, des exports vers d’autre LMS sont à l’étude (vers EdX en particulier). N’hésitez pas à nous contacter si cette procédure vous intéresse.
+	  </div>
+	</div>
+	
+	<div class="col-md-4">
+	  <strong>Des contenus sous licence libre</strong>
+	  <br>
+	  <img src="static/img/cc.svg">
+	  <br>
+	  <button type="button" data-toggle="collapse" data-target="#contenus" class="btn-odd btn-odd-primary btn-lg">En savoir
+	    <span class="icon-plus-circled"></span>
+	  </button>
+	  <div id="contenus" class="collapse panel-odd">
+	    Toutes les ressources présentés sur ce site sont déclarées sous la licence
+	    <strong>
+	      <span class="icon-cc"> Creative Commons n°5</span> :
+	      <span class="icon-cc-by"> Attribution</span> +
+	      <span class="icon-cc-nc"> Pas d’Utilisation Commerciale</span> +
+	      <span class="icon-cc-sa"> Partage dans les mêmes conditions</span> (BY NC SA).</strong>
+	    <br>Ce qui signifie que le titulaire des droits autorise l’exploitation de l’œuvre originale à des fins non commerciales, ainsi que la création d’œuvres dérivées, à condition qu’elles soient distribuées sous une licence identique à celle qui régit l’œuvre
+	    originale.
+	  </div>
+	</div>
+      </div>
+      <div class="row">
+	<div class="col-md-12">
+	  <br>
+	  <br>
+	  N'hésitez pas à prendre contact avec nous si vous souhaitez <span class="orange">adapter</span> une partie des modules dans <span class="orange">votre propre environnement d'apprentissage</span>.
+	</div>
+      </div>
+      
+    </div>
+    
+    <!-- Fin page 5 -->
+    <!-- Début page 6 -->
+    <div id="page6" class="page section-even container-fluid">
+      <div class="row">
+	<div class="col-md-12">
+	  <h1>Modules</h1>
+	  <br>
+	</div>
+      </div>
+      
+      <div class="row text-center">
+	<div class="col-md-2 col-md-offset-1">
+	  <img src="static/img/icon_internet.svg">
+	  <br>
+	  <strong>Internet</strong>
+	  <br> Bien plus que le web
+	  <br>
+	  <br>
+	  <a href="module1.html"type="button" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+	  <a type="button" data-target="" href="module1/module1.imscc.zip" class="btn-even btn-even-primary btn-modules">Télecharger (IMSCC)</a><br/>
+	  <a type="button" data-target="" href="module1/module1_edx.tar.gz" class="btn-even btn-even-primary btn-modules">Télecharger (EDX)</a>
+	</div>
+	
+	<div class="col-md-2">
+	  <img src="static/img/icon_web.svg">
+	  <br>
+	  <strong>Le Web</strong>
+	  <br> Première approche
+	  <br>
+	  <br>
+	  <a href="module2.html" type="button" data-target="" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+	  <a type="button" data-target="" href="module2/module2.imscc.zip" class="btn-even btn-even-primary btn-modules">Télecharger (IMSCC)</a><br/>
+	  <a type="button" data-target="" href="module2/module2_edx.tar.gz" class="btn-even btn-even-primary  btn-modules">Télecharger (EDX)</a>
+	</div>
+	
+	<div class="col-md-2">
+	  <img src="static/img/icon_documents.svg">
+	  <br>
+	  <strong>Les Documents</strong>
+	  <br> Représentation des données
+	  <br>
+	  <br>
+	  <a href="module3.html" type="button" data-target="" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+	  <a type="button" data-target="" href="module3/module3.imscc.zip" class="btn-even btn-even-primary  btn-modules">Télecharger (IMSCC)</a><br/>
+	  <a type="button" data-target="" href="module3/module3_edx.tar.gz" class="btn-even btn-even-primary  btn-modules">Télecharger (EDX)</a>
+	</div>
+	<div class="col-md-2">
+	  <img src="static/img/icon_txttableur.svg">
+	  <br>
+	  <strong>Traitement de texte et Tableur</strong>
+	  <br> Maitriser ces outils par la pratique
+	  <br>
+	  <br>
+	  <a href="module4.html" type="button" data-target="" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+	  <a type="button" data-target="" href="module4/module4.imscc.zip" class="btn-even btn-even-primary btn-modules">Télecharger (IMSCC)</a><br/>
+	  <a type="button" data-target="" href="module4/module4_edx.tar.gz" class="btn-even btn-even-primary btn-modules">Télecharger (EDX)</a>
+	</div>
+	<div class="col-md-2">
+	  <img src="static/img/icon_traitements.svg">
+	  <br>
+	  <strong>Les traitements numériques</strong>
+	  <br>
+	  <br>
+	  <br>
+	  <a href="module5.html" type="button" data-target="" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+	  <a type="button" data-target="" href="module5/module5.imscc.zip" class="btn-even btn-even-primary btn-modules">Télecharger (IMSCC)</a><br/>
+	  <a type="button" data-target="" href="module5/module5_edx.tar.gz" class="btn-even btn-even-primary btn-modules">Télecharger (EDX)</a>
+	</div>
+      </div>
+    </div>
+    
+    <!-- Fin page 6 -->
+    <!-- Début page 7 -->
+    <div id="page7" class="page section-odd container-fluid">
+      <div class="row">
+	<div class="col-md-12">
+	  <h1>Contacts</h1>
+	</div>
+      </div>
+      <div class="row text-center">
+	<div class="col-md-6">
+	  <img src="static/img/mail01.svg">
+	  <br>
+	  <button type="button" data-target="" class="btn-odd btn-odd-primary btn-lg email">
+	    alain<span class="iamnotadot"></span>preux
+	  </button>
+	</div>
+	<div class="col-md-6">
+	  <img src="static/img/mail02.svg">
+	  <br>
+	  <button type="button" data-target="" class="btn-odd btn-odd-primary btn-lg email">
+	    valerie<span class="iamnotadot"></span>duhal
+	  </button>
+	</div>
+      </div>
+    </div>
+    <div id="footer">
+      <img src="static/img/logo_lille3.svg">
+      <img src="static/img/logo_unr.svg">
+    </div>
+    <script>
+      $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+      $('.email').click(function() {
+      login = $(this).html().replace('<span class="iamnotadot"></span>', '.')
+      window.location.href = 'mailto:' + login + '@univ-lille3.fr';
+      });
+      });
+    </script>
+    
+    <!-- Fin page 7 -->
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="static/js/vendors/bootstrap.min.js"></script>
+    <script src="static/js/vendors/jasny-bootstrap.min.js"></script>
+    {% if body_class == 'home' %}
+    <script src="static/js/scroll.js"></script>
+    {% else %}
+    <script src="static/js/modules.js"></script>
+    {% endif %}
+
+    
+</body>
+</html>

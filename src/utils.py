@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#!cnappenv/bin/python
 from __future__ import division
 
 
@@ -13,6 +12,8 @@ from bs4 import BeautifulSoup
 from io import open
 from urlparse import urlparse
 from slugify import slugify
+from tarfile import TarInfo
+from StringIO import StringIO
 
 import logging
 
@@ -36,12 +37,13 @@ def fetch_vimeo_thumb(video_link):
     video_id = video_link.rsplit('/', 1)[1]
     logging.info("== video ID = %s" % video_id)
     try:
-        response = requests.request('GET',VIDEO_THUMB_API_URL+video_id+'.json')
+        response = requests.request('GET',
+                                    VIDEO_THUMB_API_URL+video_id+'.json')
         data = response.json()[0]
         image_link = data['thumbnail_large']
         image_link = image_link.replace('wepb', 'jpg')
     except Exception:
-        logging.exception(" ----------------  error while fetching video %s" % (video_link))
+        logging.exception("Error while fetching video %s" % (video_link))
         image_link = DEFAULT_VIDEO_THUMB_URL
     return image_link
 
@@ -175,16 +177,17 @@ def createDirs(outDir, folders):
             os.makedirs(new_folder)
 
 
-def copyMediaDir(repoDir, moduleOutDir, module):
+def copyMediaDir(repoDir, moduleOutDir, module_name):
     """ Copy the media subdir if necessary to the dest """
-    mediaDir = os.path.join(repoDir, module, "media")
+    mediaDir = os.path.join(repoDir, module_name, "media")
+    outMediaDir = os.path.join(moduleOutDir, 'media')
     if os.path.isdir(mediaDir):
         try:
-            shutil.copytree(mediaDir, os.path.join(moduleOutDir, 'media'))
+            shutil.copytree(mediaDir, outMediaDir)
         except OSError:
             logging.warn("%s already exists. Going to delete it", mediaDir)
-            shutil.rmtree(os.path.join(moduleOutDir, 'media'))
-            shutil.copytree(mediaDir, os.path.join(moduleOutDir, 'media'))
+            shutil.rmtree(outMediaDir)
+            shutil.copytree(mediaDir, outMediaDir)
 
 
 def create_empty_file_if_needed(filepath):
@@ -248,3 +251,10 @@ def cnslugify(value):
 def cntohtml(value):
     """ filter taking input in md or html and rendering it anyway """
     return markdown.markdown(value, MARKDOWN_EXT, output_format='xhtml')
+
+
+def writetarstr(tar, filepath, content):
+    """ writes a string (content) in a tarfile """
+    info = TarInfo(name=filepath)
+    info.size = len(content)
+    tar.addfile(info, StringIO(content))

@@ -14,35 +14,32 @@ Reference to a js file making DOM manipulation, in order to add dynamically new 
 {% endblock %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'form_upload' %}"><span> Création à partir de vos documents</span></a></li>
+  <li><a href="{% url 'course_from_uploaded_files' %}"><span> Création à partir de vos documents</span></a></li>
 {% endblock %}
 
 {% block content %}
 
   <div class="container">
     <h1>Création à partir de vos documents</h1>
-    <div class="row">
-      <div class="col-md-5 ">
-        <h2>Sélection des composants</h2>
-        <form action="{% url 'form_upload' %}" method="post"  enctype="multipart/form-data">
+    <form action="{% url 'course_from_uploaded_files' %}" method="post"  enctype="multipart/form-data">
+      <div class="row">
 	  <div id="info">
             {% csrf_token %}
-            {{ form.as_p}}
+            {{ course.as_p}}
 	  </div>
-	  <h3>Paramètres optionnels</h3>
-	  <div id="info">
-            {% csrf_token %}
-            {{ formOptions.as_p}}
-	  </div>
+	  <p>Sélectionnez vos modules et générez le cours. Vous pouvez également générer un cours <a href='{% url 'course_from_uploaded_archive' %}'>à partir d'une archive contenant tous les fichiers nécessaires</a>.</p>
+          <input type="submit" value="Générer le cours" />
+      </div>
+      <div class="row">
+	<div class="col-md-5 ">
 	  <h3>Modules</h3>
           <div id="modules">
             <fieldset id="module1">
               <legend>Module 1</legend>
-              {{formMod.as_p}}
+              {{module.as_p}}
             </fieldset>
           </div>
 
-          <input type="submit" value="Générer le cours" />
           <input type="button" value="Ajouter un module" onclick="createModule()">
           <input type="button" value="Retirer un module" onclick="removeModule()">
 
@@ -55,32 +52,16 @@ Reference to a js file making DOM manipulation, in order to add dynamically new 
               <br>![blabla](media/&lt;nom fichier&gt;)
             </span>
           </button><br>
-	  
           <input id="nb_module" name="nb_module" type="hidden" value="1"/>
-        </form>
-      </div>
-      <div class="col-md-7 ">
-        <ul>
-          {% for erreur in erreurs %}
-            <li>{{erreur}}</li>
-          {% endfor %}
-        </ul>
-
-        <h2>Fournissez une archive complète</h2>
-
-        <form action="{% url 'form_upload' %}" method="post"  enctype="multipart/form-data">
+	</div>
+	<div class="col-md-5">
+	  <h3>Paramètres optionnels</h3>
+	  <div id="info">
             {% csrf_token %}
-            {{ form2.as_p}}
-
-            <input type="submit" value="Submit" />
-            <!-- <span><b>/!\ Veillez à bien respecter l'architecture!</b></span> -->
-        </form>
+            {{ options.as_p}}
+	  </div>
+	</div>
       </div>
-    </div>
+    </form>
   </div>
-
-
-
-
-
 {% endblock %}

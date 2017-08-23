@@ -28,7 +28,8 @@ EMAIL_PORT = 587
 
 # Etherpad Configuration
 ETHERPAD_URL = 'http://localhost:9001/'
-# Get the APIKEY.txt file in your etherpad instance, copy the content and paste it here
+# Get the APIKEY.txt file in your etherpad instance,
+# copy the content and paste it here
 API_KEY = 'content of APIKEY.txt'
 
 # Example with PostGreSQL
@@ -55,7 +56,7 @@ DATA_URL = "http://example.com/cnapp_data/"
 
 # DATA_DIR: base directory where
 # - git repositories are cloned (DATA_DIR/repositories)
-# - associated websites are created (DATA_DIR/sites) 
+# - associated websites are created (DATA_DIR/sites)
 # For a prod env, give absolute paths to folders writable by web server user
 DATA_DIR = '/path/to/repo-data'
 # For a dev env, DATA_DIR may be inside src folder
@@ -65,8 +66,6 @@ REPOS_DIR = os.path.join(DATA_DIR, 'repositories')
 GENERATED_SITES_DIR = os.path.join(DATA_DIR, 'sites')
 
 GENERATED_SITES_URL = os.path.join(DATA_URL, 'sites')
-
-
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'agoodsecretkey'

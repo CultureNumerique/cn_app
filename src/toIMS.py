@@ -2,72 +2,60 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals    # at top of module
 
-import json
 import logging
 import os
 import sys
 import zipfile
-import random
 from io import open
-
-from lxml import etree
-from lxml import html
-from markdown import markdown
-from pprint import pprint
-from yattag import indent
-from yattag import Doc
-
-from pygiftparser import parser as pygift
-import model
+from yattag import indent, Doc
 import utils
-import fromGift
-
 import StringIO
 import re
+from cnSettings import IMS_DIRECTORY, FOLDERS
 
 # utf8 hack, python 2 only !!
 if sys.version_info[0] == 2:
     reload(sys)
     sys.setdefaultencoding('utf8')
 
-######
-##   reférences :
-#       - http://www.imsglobal.org/cc/ccv1p2/imscc_profilev1p2-Implementation.html
-#       - http://www.imsglobal.org/question/qtiv1p2/imsqti_asi_bindv1p2.html
-#############
+# #####
+# reférences :
+#  - http://www.imsglobal.org/cc/ccv1p2/imscc_profilev1p2-Implementation.html
+#  - http://www.imsglobal.org/question/qtiv1p2/imsqti_asi_bindv1p2.html
+# ############
 
 # Mapping of the types used in culturenumerique with IMSCC types
 FILETYPES = {
-    'weblink' : 'imswl_xmlv1p1',
-    'discussions' : 'imsdt_xmlv1p1',
-    'auto-evaluation' : 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
+    'weblink': 'imswl_xmlv1p1',
+    'discussions': 'imsdt_xmlv1p1',
+    'auto-evaluation': 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
     'devoirs': 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
     'Activite': 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
     'ActiviteAvancee': 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
     'Comprehension': 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment',
-    'webcontent' : 'webcontent',
-    'correction' : 'webcontent',
-    'cours' : 'webcontent',
+    'webcontent': 'webcontent',
+    'correction': 'webcontent',
+    'cours': 'webcontent'
 }
 
-# media folder is no longer copied along since all media are linked absolutely
-FOLDERS = ['Activite', 'ActiviteAvancee', 'Comprehension', 'webcontent']
 
 FOLDERS_ACTIVITY = {
-    'Activite':'act',
-    'ActiviteAvancee':'actav',
-    'Comprehension':'test',
-    'webcontent':'',
+    'Activite': 'act',
+    'ActiviteAvancee': 'actav',
+    'Comprehension': 'test',
+    'webcontent': ''
 }
 
 CC_PROFILES = {
-    'MULTICHOICE' : 'cc.multiple_choice.v0p1',
-    'MULTIANSWER' : 'cc.multiple_response.v0p1',
-    'TRUEFALSE' : 'cc.multiple_choice.v0p1', #FIXME : doing that because of a bug in Moodle 3 that can no longer import TRUTRUEFALSE cc.true_false.v0p1
-    'ESSAY' : 'cc.essay.v0p1',
+    'MULTICHOICE': 'cc.multiple_choice.v0p1',
+    'MULTIANSWER': 'cc.multiple_response.v0p1',
+    # FIXME : doing that because of a bug in Moodle 3
+    # that can no longer import TRUTRUEFALSE cc.true_false.v0p1
+    'TRUEFALSE': 'cc.multiple_choice.v0p1',
+    'ESSAY': 'cc.essay.v0p1',
     'DESCRIPTION': 'cc.essay.v0p1',
-    'MISSINGWORD' : 'cc.fib.v0p1',
-    'MATCH' : 'cc.pattern_match.v0p1'
+    'MISSINGWORD': 'cc.fib.v0p1',
+    'MATCH': 'cc.pattern_match.v0p1'
 }
 
 IMS_HEADER = """<?xml version="1.0" encoding="UTF-8"?><manifest xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1"
@@ -79,14 +67,15 @@ HEADER_TEST = """<?xml version="1.0" encoding="UTF-8"?>
     """
 
 DEFAULT_QTI_META = {
-    'cc_profile' : 'cc.exam.v0p1',
-    'qmd_assessmenttype' : 'Examination',
-    'qmd_scoretype':'Percentage',
-    'qmd_feedbackpermitted':'Yes',
-    'qmd_hintspermitted':'Yes',
-    'qmd_solutionspermitted':'Yes',
-    'cc_maxattempts':'unlimited'
+    'cc_profile': 'cc.exam.v0p1',
+    'qmd_assessmenttype': 'Examination',
+    'qmd_scoretype': 'Percentage',
+    'qmd_feedbackpermitted': 'Yes',
+    'qmd_hintspermitted': 'Yes',
+    'qmd_solutionspermitted': 'Yes',
+    'cc_maxattempts': 'unlimited'
 }
+
 
 def set_qti_metadata(questions):
 
@@ -107,6 +96,7 @@ def set_qti_metadata(questions):
 
     return indent(meta.getvalue())
 
+
 def create_ims_test(questions, test_id, test_title):
     """
 
@@ -116,17 +106,19 @@ def create_ims_test(questions, test_id, test_title):
     doc.asis(HEADER_TEST+'\n')
     with tag('assessment', ident=test_id, title=test_title):
         doc.asis(set_qti_metadata(questions))
-        #<!-- Titre de l'excercice  -->
+        # <!-- Titre de l'excercice  -->
         with tag('rubric'):
             with tag('material', label="Summary"):
                 with tag('mattext', texttype="text/html"):
                     text()
         # only one section in a test
         with tag('section', ident='section_1_test_'+test_id):
-        # loop on questions
+            # loop on questions
             for idx, question in enumerate(questions):
+                if not question.valid:
+                    continue
                 with tag('item', ident='q_'+str(idx), title=question.title):
-                    #<!--  metatata  -->
+                    # <!--  metatata  -->
                     with tag('itemmetadata'):
                         with tag('qtimetadata'):
                             with tag('qtimetadatafield'):
@@ -139,7 +131,7 @@ def create_ims_test(questions, test_id, test_title):
                                     text("cc_question_category")
                                 with tag('fieldentry'):
                                     text('Quiz Bank '+test_title)
-                    #Contenu de la question
+                    # Contenu de la question
                     with tag('presentation'):
                         # Enoncé
                         with tag('material'):
@@ -147,22 +139,31 @@ def create_ims_test(questions, test_id, test_title):
                                 txt = utils.cntohtml(question.text)
                                 text(utils.add_target_blank(txt))
                         # réponses possibles
-                        question.answers.possiblesAnswersIMS(doc,tag,text)
+                        question.answers.possiblesAnswersIMS(doc, tag, text)
                     # Response Processing
                     with tag('resprocessing'):
                         # outcomes: FIXME: allways the same ?
                         with tag('outcomes'):
-                            doc.stag('decvar', varname='SCORE', vartype='Decimal', minvalue="0", maxvalue="100")
-                        # respconditions pour décrire quelle est la bonne réponse, les interactions, etc
+                            doc.stag('decvar',
+                                     varname='SCORE',
+                                     vartype='Decimal',
+                                     minvalue="0",
+                                     maxvalue="100")
+                        # respconditions pour décrire quelle est
+                        # la bonne réponse, les interactions, etc
                         if question.generalFeedback != '':
-                            with tag('respcondition', title='General feedback', kontinue='Yes'):
+                            with tag('respcondition',
+                                     title='General feedback',
+                                     kontinue='Yes'):
                                 with tag('conditionvar'):
                                     doc.stag('other')
-                                doc.stag('displayfeedback', feedbacktype="Response", linkrefid='general_fb')
-                        ## lister les autres interactions/conditions
-                        question.answers.listInteractionsIMS(doc,tag,text)
+                                doc.stag('displayfeedback',
+                                         feedbacktype="Response",
+                                         linkrefid='general_fb')
+                        # lister les autres interactions/conditions
+                        question.answers.listInteractionsIMS(doc, tag, text)
                     # liste les feedbacks
-                    ## feedback general
+                    # feedback general
                     if question.generalFeedback != '':
                         with tag('itemfeedback', ident='general_fb'):
                             with tag('flow_mat'):
@@ -170,13 +171,16 @@ def create_ims_test(questions, test_id, test_title):
                                     with tag('mattext', texttype='text/html'):
                                         fb = utils.cntohtml(question.generalFeedback)
                                         text(utils.add_target_blank(fb))
-                    ## autres feedbacks
-                    question.answers.toIMSFB(doc,tag,text)
+                    # autres feedbacks
+                    question.answers.toIMSFB(doc, tag, text)
     doc.asis('</questestinterop>\n')
-    doc_value = indent(doc.getvalue().replace('\n', '')) #pre-escaping new lines because of a bug in moodle that turn them in <br>
+    # pre-escaping new lines because of a bug in moodle that turn them in <br>
+    doc_value = indent(doc.getvalue().replace('\n', ''))
     doc_value = doc_value.replace('kontinue', 'continue')
-    doc_value = re.sub(re.compile('/\w*/media/'), '../static/', doc_value) # Change la source du media vers le dossier static
+    # Change la source du media vers le dossier static
+    doc_value = re.sub(re.compile('/\w*/media/'), '../static/', doc_value)
     return doc_value
+
 
 def create_empty_ims_test(id, num, title, max_attempts):
     """
@@ -191,7 +195,8 @@ def create_empty_ims_test(id, num, title, max_attempts):
 
 
 def generateIMSManifest(m):
-    """ parse m from config file 'moduleX.config.json' and recreate imsmanifest.xml """
+    """parse m from config file 'moduleX.config.json' and recreate
+    imsmanifest.xml"""
     # create magic yattag triple
     doc, tag, text = Doc().tagtext()
     # open tag 'manifest' with default content:
@@ -222,40 +227,66 @@ def generateIMSManifest(m):
     # Print organization
     resources = []
     with tag('organizations'):
-        with tag('organization', identifier="organization0", structure='rooted-hierarchy'):
+        with tag('organization',
+                 identifier="organization0",
+                 structure='rooted-hierarchy'):
             with tag('item', identifier='root'):
-                # add empty section as section "0 . Généralités" to avoid wrong numbering
+                # add empty section as section "0 . Généralités" to
+                # avoid wrong numbering
                 with tag('item', identifier='section_generalites'):
                     with tag('title'):
-                        # doc.asis('<![Cm[<span class="ban-sec ban-howto"></span>]]>')
+                        # doc.asis('<![Cm[<span class="ban-sec
+                        # ban-howto"></span>]]>')
                         doc.asis('')
                 for idA, section in enumerate(m.sections):
                     section_id = "sec_"+(str(idA))
                     with tag('item', identifier=section_id):
                         with tag('title'):
                             doc.text(section.num+' '+section.title)
-                            # doc.asis('<![CDATA[<span class="sumtitle">'+section.num+' '+section.title+'</span>]]>')
+                            # doc.asis('<![CDATA[<span
+                            # class="sumtitle">'+section.num+'
+                            # '+section.title+'</span>]]>')
                         subsec_type_old = ''
                         subsec_type = ''
                         for idB, subsection in enumerate(section.subsections):
                             subsec_type_old = subsec_type
                             subsec_type = subsection.folder
                             href = subsection.folder+'/'+subsection.filename
-                            # when adding moodle-test type change file suffix from .html.xml
-                            if subsec_type in ['Activite', 'ActiviteAvancee', 'Comprehension']:
+                            # when adding moodle-test type change file
+                            # suffix from .html.xml
+                            if subsec_type in ['Activite',
+                                               'ActiviteAvancee',
+                                               'Comprehension']:
                                 href = href.replace('html', 'xml')
-                            filename = href.rsplit('/',1)[1]
+                            filename = href.rsplit('/', 1)[1]
                             resources.append(filename)
-                            with tag('item', identifier=("subsec_"+str(idA)+"_"+str(idB)), identifierref=("doc_"+str(idA)+"_"+str(idB))):
+                            with tag('item', identifier=("subsec_" +
+                                                         str(idA) +
+                                                         "_" +
+                                                         str(idB)),
+                                     identifierref=("doc_" +
+                                                    str(idA) +
+                                                    "_" +
+                                                    str(idB))):
                                 with tag('title'):
                                     if subsec_type == 'webcontent':
-                                        text(subsection.num+' '+subsection.title)
+                                        text(subsection.num +
+                                             ' ' +
+                                             subsection.title)
                                     else:
                                         # subsec_type != 'webcontent':
                                         if subsec_type != subsec_type_old:
-                                            doc.asis('<![CDATA[<span class="ban-sub ban-'+FOLDERS_ACTIVITY[subsec_type]+'">'+subsection.num+' '+subsection.title+'</span>]]>')
+                                            doc.asis('<![CDATA[<span class="ban-sub ban-' +
+                                                     FOLDERS_ACTIVITY[subsec_type] +
+                                                     '">' +
+                                                     subsection.num +
+                                                     ' ' +
+                                                     subsection.title +
+                                                     '</span>]]>')
                                         else:
-                                            text(subsection.num+' '+subsection.title)
+                                            text(subsection.num +
+                                                 ' ' +
+                                                 subsection.title)
 
     # Print resources
     with tag('resources'):
@@ -264,158 +295,157 @@ def generateIMSManifest(m):
             for idB, subsection in enumerate(section.subsections):
                 doc_id = "doc_"+str(idA)+"_"+str(idB)
                 file_type = FILETYPES[subsection.folder]
-                # When adding moodle test resource change file suffix from .html to .xml
+                # When adding moodle test resource change file suffix
+                # from .html to .xml
                 href = subsection.folder+'/'+subsection.filename
-                if subsection.folder in ['Activite', 'ActiviteAvancee', 'Comprehension']:
+                if subsection.folder in ['Activite',
+                                         'ActiviteAvancee',
+                                         'Comprehension']:
                     href = href.replace('html', 'xml')
-                for media in subsection.medias: # Add in ressource pictures
-                    with tag('resource', identifier=media['media_id'], type=file_type):
-                        doc.stag('file', href="static/"+media['media_name'])
-                with tag('resource', identifier=doc_id, type=file_type, href=href):
-                     doc.stag('file', href=href)
-                     for media in subsection.medias: # Add media dependency for each subsection
-                         doc.stag('dependency', identifierref=media['media_id'])
 
-    doc.asis("</manifest>") # IMS footer
+                for media in subsection.medias:
+                    # Add in ressource pictures
+                    with tag('resource',
+                             identifier=media['media_id'],
+                             type=file_type):
+                        doc.stag('file', href="static/"+media['media_name'])
+                with tag('resource',
+                         identifier=doc_id,
+                         type=file_type,
+                         href=href):
+                    doc.stag('file',
+                             href=href)
+                    for media in subsection.medias:
+                        # Add media dependency for each subsection
+                        doc.stag('dependency',
+                                 identifierref=media['media_id'])
+
+    # IMS footer
+    doc.asis("</manifest>")
     return indent(doc.getvalue())
 
-def generateImsArchive(module_object, module_name, module_directory):
+
+def generateIMSArchive(module, out_directory):
+    """ Generate an IMS archive for a given module
+
+    :param module_object: a module
+    :param out_directory: path of the output dir in which
+                          we create an IMS_DIRECTORY directory
+                          where out IMS data are located
+    """
     # Prepare paths and directories
-    cur_dir = os.getcwd()
-    os.chdir(module_directory)
-    ims_outdir = os.path.join(module_directory, 'IMS')
-    os.makedirs(ims_outdir)
-    utils.createDirs(ims_outdir, FOLDERS)
-
-    # Generate Html and XML files
-    for section in module_object.sections:
-        for sub in section.subsections:
-            if sub.folder == 'webcontent':
-                utils.write_file(sub.html_src, ims_outdir, sub.folder, sub.getFilename())
-            else:
-                utils.write_file(sub.toXMLMoodle(), ims_outdir, sub.folder, sub.getFilename('xml'))
-
-    # parse data and generate imsmanifest.xml
-    imsfilename = os.path.join(ims_outdir, 'imsmanifest.xml')
-    imsfile = open(imsfilename, 'w', encoding='utf-8')
-    imsfile.write(generateIMSManifest(module_object))
-    imsfile.close()
-    logging.warning("[toIMS] imsmanifest.xml saved for module %s", module_directory)
-
-    # Compress relevant files
-    fileout = module_name+'.imscc.zip'
-    zipf = zipfile.ZipFile(fileout, 'w')
-    zipf.write(imsfilename)
-    for dir_name in FOLDERS:
-        try:
-            if os.listdir(os.path.join(ims_outdir, dir_name)):
-                for afile in os.listdir(os.path.join(ims_outdir, dir_name)):
-                    filepath = os.path.join(ims_outdir, dir_name, afile)
-                    logging.info("[toIMS] Adding %s to archive " % (filepath))
-                    zipf.write(filepath)
-        except:
-            continue
-
-    zipf.close()
-    os.chdir(cur_dir)
-    return fileout
-
-
-def generateImsArchiveLight(module, moduleOutDir, zipFile, mediaData, mediaNom):
-    # Prepare paths and directories
-    #cur_dir = os.getcwd()
-    #os.chdir(module_directory)
-    ims_outdir = os.path.join(moduleOutDir, 'IMS')
-    #os.makedirs(ims_outdir)
-    #utils.createDirs(ims_outdir, FOLDERS)
+    ims_out_dir = os.path.join(out_directory, IMS_DIRECTORY)
+    utils.createDirs(ims_out_dir, FOLDERS)
 
     # Generate Html and XML files
     for section in module.sections:
         for sub in section.subsections:
             if sub.folder == 'webcontent':
-                new_html = sub.IMSMediaLinks()
-                html_filename = os.path.join(ims_outdir,sub.folder,sub.getFilename())
-                zipFile.writestr(html_filename, new_html.encode("UTF-8"))
+                utils.write_file(sub.html_src,
+                                 ims_out_dir,
+                                 sub.folder,
+                                 sub.getFilename())
             else:
-                xml_filename = os.path.join(ims_outdir,sub.folder,sub.getFilename('xml'))
-                zipFile.writestr(xml_filename, sub.toXMLMoodle().encode("UTF-8"))
-                #utils.write_file(sub.toXMLMoodle(), ims_outdir, sub.folder, sub.getFilename('xml'))
+                utils.write_file(sub.toXMLMoodle(),
+                                 ims_out_dir,
+                                 sub.folder,
+                                 sub.getFilename('xml'))
 
     # parse data and generate imsmanifest.xml
-    ims_filename = os.path.join(ims_outdir, 'imsmanifest.xml')
-    zipFile.writestr(ims_filename, generateIMSManifest(module).encode("UTF-8"))
-
-    if mediaData: # add media files in '/IMS/static'
-        for media, nom in zip(mediaData, mediaNom):
-            media.seek(0)
-            zipFile.writestr(ims_outdir+'/static/'+nom, media.read())
-
-
-    #imsfile = open(imsfilename, 'w', encoding='utf-8')
-    #imsfile.write(generateIMSManifest(module_object))
-    #imsfile.close()
-    logging.warning("[toIMS] imsmanifest.xml saved for module %s", moduleOutDir)
-
+    imsfilename = os.path.join(ims_out_dir, 'imsmanifest.xml')
+    imsfile = open(imsfilename, 'w', encoding='utf-8')
+    imsfile.write(generateIMSManifest(module))
+    imsfile.close()
+    logging.info("[toIMS] imsmanifest.xml saved for module %s",
+                 ims_out_dir)
 
     # Compress relevant files
-    file_out = os.path.join(module.module,module.module+'.imscc.zip')
-
-
-    tab=zipFile.namelist()
-    reEdxPath = re.compile('^'+module.module+'/IMS')
-
-
-    zipArchiveIO = StringIO.StringIO()
-
-    zipf = zipfile.ZipFile(zipArchiveIO, 'w')
-
-    #for each IMS element belonging to the module
-    for elt in tab:
-        res=reEdxPath.match(elt)
-        if res:
-            # adding the file to the zip archive
-            zipf.writestr(elt,zipFile.read(elt))
-            data=zipFile.read(elt)
-    zipf.close()
-
-    zipArchiveIO.seek(0)
-    zipFile.writestr(file_out, zipArchiveIO.read())
-
-
-
-    """
-    zipf.write(imsfilename)
+    fileout = os.path.join(out_directory, module.name + '.imscc.zip')
+    zipf = zipfile.ZipFile(fileout, 'w')
+    zipf.write(imsfilename, os.path.join(module.name, 'imsmanifest.xml'))
     for dir_name in FOLDERS:
         try:
-            if os.listdir(os.path.join(ims_outdir, dir_name)):
-                for afile in os.listdir(os.path.join(ims_outdir, dir_name)):
-                    filepath = os.path.join(ims_outdir, dir_name, afile)
+            if os.listdir(os.path.join(ims_out_dir, dir_name)):
+                for afile in os.listdir(os.path.join(ims_out_dir, dir_name)):
+                    filepath = os.path.join(ims_out_dir, dir_name, afile)
+                    arcname = os.path.join(module.name, dir_name, afile)
                     logging.info("[toIMS] Adding %s to archive " % (filepath))
-                    zipf.write(filepath)
+                    zipf.write(filepath, arcname)
         except:
             continue
 
     zipf.close()
-
-
-    os.chdir(cur_dir)
     return fileout
+
+
+def generateIMSArchiveIO(module,
+                         mediaFiles,
+                         mediaNames):
     """
-    return zipFile
+    Writes the IMS content in a zipfile and returns that zipfile.
+    The structure of this archive is contained in a tree /<IMS_DIRECTORY>/
+    (usually IMS_DIRECTORY=IMS) and returns the zipfile as a StringIO.
+    """
+    # Prepare paths and directories
+    # ims_out_dir = os.path.join(moduleOutDir, IMS_DIRECTORY)
+    ims_archive_dir = IMS_DIRECTORY
+    zipArchiveIO = StringIO.StringIO()
+    zipf = zipfile.ZipFile(zipArchiveIO, 'w')
+
+    # Generate Html and XML files
+    for section in module.sections:
+        for sub in section.subsections:
+            if sub.folder == 'webcontent':
+                new_html = sub.rebaseMediaLinks('../static')
+                html_filename = os.path.join(ims_archive_dir,
+                                             sub.folder,
+                                             sub.getFilename())
+                zipf.writestr(html_filename, new_html.encode("UTF-8"))
+            else:
+                xml_filename = os.path.join(ims_archive_dir,
+                                            sub.folder,
+                                            sub.getFilename('xml'))
+                zipf.writestr(xml_filename,
+                              sub.toXMLMoodle().encode("UTF-8"))
+
+    # parse data and generate imsmanifest.xml
+    ims_filename = os.path.join(ims_archive_dir, 'imsmanifest.xml')
+    zipf.writestr(ims_filename, generateIMSManifest(module).encode("UTF-8"))
+
+    if mediaFiles:
+        # add media files in '/IMS/static'
+        for media, name in zip(mediaFiles, mediaNames):
+            media.seek(0)
+            zipf.writestr(os.path.join(ims_archive_dir,
+                                       'static',
+                                       name),
+                          media.read())
+
+    logging.info("[toIMS] imsmanifest.xml saved for module %s",
+                 module.name)
+
+    zipf.close()
+    return zipArchiveIO
 
 
 def main(argv):
-    """
-    """
     import argparse
     parser = argparse.ArgumentParser(description="toIMS is a utility to help building imscc archives for exporting curent material to Moodle. Usage: $ python toIMS.py -d module_directory -n module_name .")
-    parser.add_argument("-d", "--module_directory", help="Set the module directory", default='.')
-    parser.add_argument("-n", "--module_name", help="Set the name of the module", default='module')
+    parser.add_argument("-d",
+                        "--module_directory",
+                        help="Set the module directory",
+                        default='.')
+    parser.add_argument("-n",
+                        "--module_name",
+                        help="Set the name of the module",
+                        default='module')
 
     args = parser.parse_args()
 
-    fileout_path = generateImsArchive(args.module_name, args.module_directory)
-    print("archive generated %s" % fileout_path)
+    exit(1)
+    # FIXME parse the module first !
+    fileout_path = generateIMSArchive(args.module_name, args.module_directory)
+    print("archive generated in %s" % fileout_path)
     exit(0)
 
 

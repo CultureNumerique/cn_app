@@ -29,7 +29,7 @@ MARKDOWN_EXT = ['markdown.extensions.extra', 'superscript']
 
     >>> pygift.[class_name].newMethod = myNewMethod
 
-    for apply patch, import pygift and fromGift in your file.
+    To apply this patch, import pygift and fromGift in your file.
 
 """
 

@@ -1,0 +1,30 @@
+
+<!-- Template Creating course from archive -->
+
+{% extends "app.html" %}
+
+{% block titre %}Formulaire{% endblock %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'course_from_uploaded_archive' %}"><span>Création de cours à partir d'une archive</span></a></li>
+{% endblock %}
+
+{% block content %}
+
+    <ul>
+      {% for erreur in erreurs %}
+        <li>{{erreur}}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Création à partir de vos documents dans une archive</h2>
+    <form action="{% url 'course_from_uploaded_archive' %}" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+      {{course.as_p}}
+      {{ form.as_p}}
+      <input type="submit" value="Submit" />
+    </form>
+
+
+
+{% endblock %}

@@ -7,18 +7,18 @@ import unittest
 from collections import namedtuple
 from StringIO import StringIO
 from jinja2 import Environment, FileSystemLoader
+import logging
 import sys
 import os
-import logging
-
-# Path hack for getting access to src python modules
-sys.path.insert(0, os.path.abspath('..'))
-from src import model, utils, fromGift, toEDX
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '..'))
+from src import model, utils, fromGift
 
 # Ignore Warning
 logger = logging.getLogger()
 logger.setLevel(40)
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 # TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
@@ -42,7 +42,6 @@ logger.setLevel(40)
 
 class FctParserTestCase(unittest.TestCase):
 
-
     def test_default_parser_head(self):
         """
         This method check default values of header.
@@ -55,7 +54,7 @@ class FctParserTestCase(unittest.TestCase):
         "css": "http://culturenumerique.univ-lille3.fr/css/base.css",
         "language": "fr",
         "menutitle": "Titre",
-        "module": "culnu",
+        "name": "culnu",
         "title": "Titre long"
         }
         """)
@@ -91,8 +90,8 @@ class FctParserTestCase(unittest.TestCase):
         self.assertEqual(control_header.menutitle,
                          sample_header.menutitle,
                          "Not the same menutitle in default_parser_head")
-        self.assertEqual(control_header.module,
-                         sample_header.module,
+        self.assertEqual(control_header.name,
+                         sample_header.name,
                          "Not the same module in default_parser_head")
         print("[FctParserTestCase]-- default_parser_head OK --")
 
@@ -416,7 +415,7 @@ Je suis une AnyActivity {
 
     def testCourseProgram(self):
 
-        cp = model.CourseProgram('repository')
+        cp = model.CourseProgram('Culture Numérique','repository')
         self.assertEqual('repository', cp.repository)
         self.assertEqual([], cp.modules)
         self.assertEqual('Culture Numérique', cp.title)
@@ -487,7 +486,7 @@ ok
         mod = model.Module(io_test, 'test')
         edx_list = ''
         for q in mod.sections[0].subsections[0].questions:
-            edx_list += toEDX.toEdxProblemXml(q)
+            edx_list += q.toEDX()
         self.assertEqual(edx_list.replace('\n', '').strip(),
                          mod.sections[0].subsections[0].toEdxProblemsList().replace('\n', '').strip())
 
@@ -729,4 +728,5 @@ Fin
 
 # Main
 if __name__ == '__main__':
+
     unittest.main(verbosity=1)

@@ -26,14 +26,15 @@ from django.contrib.auth.models import User
 
 
 from .models import Repository, Cours, Module, Profil
-from .forms import UploadForm, UploadFormLight, ModuleForm, ReUploadForm, CreateNew, CreateUserForm, ConnexionForm, GenerateCourseForm, SearchUser, CreateRepository, ModifyRepository
+from .forms import ReUploadForm, CreateNew, CreateUserForm, ConnexionForm, GenerateCourseForm, SearchUser, CreateRepository, ModifyRepository
+from .forms import CourseProgram, CourseOptions, CourseModule, CourseFromArchive
 from .utils import run_shell_command
 
 from cn_app.settings import ETHERPAD_URL
 from cn_app.settings import API_KEY
 
 from src import model
-from src import cnExportLight as cn
+from src import cnExportIO as cn
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +129,7 @@ def visit_site(request, slug):
 #        SIMPLE FORMS VIEWS     #
 #                               #
 #################################
-def form_upload(request):
+def course_from_uploaded_files(request):
     """
     View creating archive using a simple form with inputs only (no etherpad).
     Each module is composed of a markdown file, and a media folder.
@@ -138,108 +139,69 @@ def form_upload(request):
     """
     sauvegarde = False
 
-    form = UploadForm(request.POST or None, request.FILES or None)
-    formMod = ModuleForm(request.POST or None, request.FILES or None)
+    courseTitle = CourseProgram(request.POST or None, request.FILES or None)
+    courseOptions = CourseOptions(request.POST or None,
+                                  request.FILES or None)
+    courseModule = CourseModule(request.POST or None, request.FILES or None)
 
-    if form.is_valid() and formMod.is_valid():
+    if courseTitle.is_valid() and courseOptions.is_valid() and courseModule.is_valid():
 
-        homeData = form.cleaned_data["home"]
-        titleData = form.cleaned_data["nom_cours"]
-        logoData = form.cleaned_data["logo"]
-        feedback = form.cleaned_data["feedback"]
+        titleCP = courseTitle.cleaned_data["courseTitle"]
 
-        modulesData = []
-        mediasData = []
-        mediasType = []
+        homeData = courseOptions.cleaned_data["home"]
+        siteTemplate = courseOptions.cleaned_data["siteTemplate"]
+        moduleTemplate = courseOptions.cleaned_data["moduleTemplate"]
+        logoData = courseOptions.cleaned_data["logo"]
+        feedback = courseOptions.cleaned_data["feedback"]
+
+        moduleFiles = []
+        mediaArchiveFiles = []
         nbModule = request.POST.get("nb_module")
 
         # Go through each modules to get the md and media data
         for i in range(1, int(nbModule)+1):
             nomModule = "module_"+str(i)
             nomMedia = "media_"+str(i)
-            moduleData = request.FILES.get(nomModule)
-            mediaData = request.FILES.get(nomMedia)
 
-            modulesData.append(moduleData)
-            mediasData.append(mediaData)
+            moduleFiles.append(request.FILES.get(nomModule))
+            mediaArchiveFiles.append(request.FILES.get(nomMedia))
 
-            if mediaData:
-                mediaName = request.FILES.get(nomMedia).name
-                # Specify if the media is empty or not (tar.gz or empty)
-                if re.match(r"^.*\.tar\.gz", mediaName):
-                    mediasType.append("application/octet-stream")
-                elif re.match(r"^.*\.zip", mediaName):
-                    mediasType.append("application/zip")
-                else:
-                    mediasType.append('None')
-            else:
-                mediasType.append('None')
-
-        mediasDataObj, mediasNom = cn.extractMediaArchive(mediasData,
-                                                          mediasType)
-
-        zip = cn.generateArchive(modulesData,
-                                 mediasDataObj,
-                                 mediasNom,
-                                 homeData,
-                                 titleData,
-                                 logoData,
-                                 feedback)
+        zip = cn.generateSiteArchive(moduleFiles,
+                                     mediaArchiveFiles,
+                                     homeData,
+                                     titleCP,
+                                     logoData,
+                                     feedback,
+                                     siteTemplate,
+                                     moduleTemplate)
 
         sauvegarde = True
 
         response = HttpResponse(zip)
         response['Content-Type'] = 'application/octet-stream'
-        response['Content-Disposition'] = "attachment; filename=\"" + titleData+".zip\""
+        response['Content-Disposition'] = "attachment; filename=\"" + titleData + ".zip\""
         return response
 
-    # form upload light
-    erreurs = []
-    form2 = UploadFormLight(request.POST or None, request.FILES or None)
-
-    if form2.is_valid():
-
-        archiveData = form2.cleaned_data["archive"]
-        archiveName = form2.cleaned_data["archive"].name
-        feedback = form2.cleaned_data["feedback"]
-
-        archiveType = "None"
-        if re.match(r"^.*\.tar\.gz", archiveName):
-            archiveType = "application/octet-stream"
-        elif re.match(r"^.*\.zip", archiveName):
-            archiveType = "application/zip"
-
-        zip, title, erreurs = cn.generateArchiveLight(archiveData,
-                                                      archiveType,
-                                                      feedback)
-
-        sauvegarde = True
-
-        if not erreurs:
-            response = HttpResponse(zip)
-            response['Content-Type'] = 'application/octet-stream'
-            response['Content-Disposition'] = "attachment; filename=\""+title+".zip\""
-            return response
-
-    return render(request, 'form.html', {
-        'form': form,
-        'formMod': formMod,
-        'form2': form2,
-        'sauvegarde': sauvegarde,
-        'erreurs': erreurs
+    return render(request, 'courseFromFiles.html', {
+        'course': courseTitle,
+        'options': courseOptions,
+        'module': courseModule,
+        'sauvegarde': sauvegarde
     })
 
 
-def form_upload_light(request):
+def course_from_uploaded_archive(request):
     """
         View requesting an archive already made by the user
         Generate directly the website by calling generateArchiveLight
     """
     sauvegarde = False
     erreurs = []
-    form = UploadFormLight(request.POST or None, request.FILES or None)
+    courseTitle = CourseProgram(request.POST or None, request.FILES or None)
+    form = CourseFromArchive(request.POST or None, request.FILES or None)
 
-    if form.is_valid():
+    if form.is_valid() and courseTitle.is_valid():
+        titleCP = courseTitle.cleaned_data["courseTitle"]
 
         archiveData = form.cleaned_data["archive"]
         archiveName = form.cleaned_data["archive"].name
@@ -251,9 +213,10 @@ def form_upload_light(request):
         elif re.match(r"^.*\.zip", archiveName):
             archiveType = "application/zip"
 
-        zip, title, erreurs = cn.generateArchiveLight(archiveData,
-                                                      archiveType,
-                                                      feedback)
+        zip, title, erreurs = cn.generateSiteArchiveFromArchive(titleCP,
+                                                                archiveData,
+                                                                archiveType,
+                                                                feedback)
 
         sauvegarde = True
 
@@ -263,7 +226,8 @@ def form_upload_light(request):
             response['Content-Disposition'] = "attachment; filename=\""+title+".zip\""
             return response
 
-    return render(request, 'formlight.html', {
+    return render(request, 'courseFromArchive.html', {
+        'course': courseTitle,
         'form': form,
         'sauvegarde': sauvegarde,
         'erreurs': erreurs
@@ -600,6 +564,8 @@ def cours(request, id_cours):
         logoData = form_generate.cleaned_data["logo"]
         medias = form_generate.cleaned_data["medias"]
         feedback = form_generate.cleaned_data["feedback"]
+        siteTemplate = form_generate.cleaned_data["siteTemplate"]
+        moduleTemplate = form_generate.cleaned_data["moduleTemplate"]
 
         # url to export the pad into markdown file
         url_home = ETHERPAD_URL+'p/'+cours.url_home+'/export/txt'
@@ -612,7 +578,6 @@ def cours(request, id_cours):
         homeData = StringIO.StringIO(response.read())
 
         modulesData = []
-        mediasData = []
         archiveType = "None"
         if medias:
             mediasName = form_generate.cleaned_data["medias"].name
@@ -631,15 +596,15 @@ def cours(request, id_cours):
                                                             archiveType,
                                                             len(cours.module_set.all()))
 
-        xmlCourse = cn.writeXMLCourse(cours)
-        zip = cn.generateArchive(modulesData,
-                                 mediasData,
-                                 mediasNom,
-                                 homeData,
-                                 titleData,
-                                 logoData,
-                                 feedback,
-                                 xmlCourse)
+        zip = cn.generateSiteArchive(modulesData,
+                                     mediasData,
+                                     mediasNom,
+                                     homeData,
+                                     titleData,
+                                     logoData,
+                                     feedback,
+                                     siteTemplate,
+                                     moduleTemplate)
 
         response = HttpResponse(zip)
         response['Content-Type'] = 'application/octet-stream'
@@ -913,7 +878,7 @@ def connexion(request):
 
     error = False
     form = ConnexionForm(request.POST or None)
-        
+
     if form.is_valid():
         username = form.cleaned_data["username"]
         password = form.cleaned_data["password"]

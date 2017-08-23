@@ -1,13 +1,14 @@
 Django
 django_extensions
 lxml
-yattag
 python-slugify
 markdown
 html
-MarkdownSuperscript
 flask
 requests
+pygiftparser
+MarkdownSuperscript
+yattag
 
 # test
 mock
@@ -25,4 +26,3 @@ Sphinx
 sphinx-rtd-theme
 recommonmark
 
-# git+https://github.com/mtommasi/pygiftparser#egg=pygiftparser

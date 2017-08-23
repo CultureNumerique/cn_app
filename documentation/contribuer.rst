@@ -207,7 +207,7 @@ Résoudre le problème des accents dans les gifts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Pour Compréhension, Activité et Activitée Avancée, les accents ne passent plus dans.
 Problème dans l'ouverture du fichier qu'il faudra ouvrir en `UTF-8` mais
-cela semble poser des soucis (voir dans `processModuleLight` ou ``generateArchive`).
+cela semble poser des soucis (voir dans `createModule` ou ``generateArchive`).
 
 Fichier d'erreur pour l'utilisateur
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

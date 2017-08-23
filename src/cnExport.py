@@ -3,23 +3,16 @@ import argparse
 import os
 import sys
 import logging
-import shutil
 import glob
 
-import markdown
 from io import open
-from jinja2 import Environment, FileSystemLoader
 
 import utils
 import toIMS
 import toEDX
+import toHTML
 import model
-
-
-MARKDOWN_EXT = ['markdown.extensions.extra', 'superscript']
-BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-TEMPLATES_PATH = os.path.join(BASE_PATH, 'templates')
-LOGFILE = os.path.join(BASE_PATH, 'logs', 'cnExport.log')
+from cnSettings import BASE_PATH
 
 
 def writeHtml(module, outModuleDir, html):
@@ -31,32 +24,45 @@ def writeHtml(module, outModuleDir, html):
     moduleHtml.close()
 
 
-def processModule(args, repoDir, outDir, module):
-    """ given input paramaters, process a module
+def processModule(args, source_dir, out_dir, module_name):
+    """given input paramaters, process a module. Outputs are generated in
+    directory module_name under out_dir.
 
-        :param args: result of parser.parse_args
+        :param args: Namespace result of parser.parse_args
+        :param out_dir: output directory
+        :param module_name: module name
+
     """
 
-    moduleDir = os.path.join(repoDir, module)
-    moduleOutDir = os.path.join(outDir, module)
-    utils.copyMediaDir(repoDir, moduleOutDir, module)
+    moduleDir = os.path.join(source_dir, module_name)
+    moduleOutDir = os.path.join(out_dir, module_name)
+    utils.copyMediaDir(source_dir, moduleOutDir, module_name)
 
     # Fetch and parse md file
     filein = utils.fetchMarkdownFile(moduleDir)
     with open(filein, encoding='utf-8') as md_file:
-        m = model.Module(md_file, module, args.baseUrl)
+        m = model.Module(md_file, module_name, args.baseUrl)
 
+    # check if there is a logo
+    logopath = os.path.join(moduleDir, "logo.png")
+    if os.path.exists(logopath):
+        m.logo_filename = logopath
+
+    # HTML output (necessary for any output)
     m.toHTML(args.feedback)  # only generate html for all subsections
 
-    # write html, XML, and JSon files
-    utils.write_file(m.toGift(),
-                     moduleOutDir,
-                     '',
-                     module+'.questions_bank.gift.txt')
-    utils.write_file(m.toVideoList(),
-                     moduleOutDir,
-                     '',
-                     module+'.video_iframe_list.txt')
+    # gift files
+    if not args.no_gift:
+        utils.write_file(m.toGift(),
+                         moduleOutDir,
+                         '',
+                         module_name+'.questions_bank.gift.txt')
+    # Video list
+    if not args.no_video:
+        utils.write_file(m.toVideoList(),
+                         moduleOutDir,
+                         '',
+                         module_name+'.video_iframe_list.txt')
 
     # EDX files
     if args.edx:
@@ -64,7 +70,7 @@ def processModule(args, repoDir, outDir, module):
 
     # # if chosen, generate IMS archive
     if args.ims:
-        m.ims_archive_path = toIMS.generateImsArchive(m, module, moduleOutDir)
+        m.ims_archive_path = toIMS.generateIMSArchive(m, moduleOutDir)
         logging.warn('*Path to IMS = %s*' % m.ims_archive_path)
 
     # return module object
@@ -74,7 +80,7 @@ def processModule(args, repoDir, outDir, module):
 def processRepository(args, repoDir, outDir):
     """ takes arguments and directories and process repository  """
     os.chdir(repoDir)
-    course_obj = model.CourseProgram(repoDir)
+    course_program = model.CourseProgram(args.title, repoDir)
     # first checks
     if args.modules is None:
         listt = glob.glob("module[0-9]")
@@ -82,72 +88,15 @@ def processRepository(args, repoDir, outDir):
 
     for module in args.modules:
         logging.info("\nStart Processing %s", module)
-        course_obj.modules.append(processModule(args, repoDir, outDir, module))
+        course_program.modules.append(processModule(args,
+                                                    repoDir,
+                                                    outDir,
+                                                    module))
 
-    return course_obj
-
-
-def buildSite(course_obj, repoDir, outDir):
-    """ Generate full site from result of parsing repository """
-
-    jenv = Environment(loader=FileSystemLoader(TEMPLATES_PATH))
-    jenv.filters['slugify'] = utils.cnslugify
-    site_template = jenv.get_template("site_layout.html")
-    # if found, copy logo.png, else use default
-    logo_files = glob.glob(os.path.join(repoDir, 'logo.*'))
-    if len(logo_files) > 0:
-        logo = logo_files[0].rsplit('/', 1)[1]
-        try:
-            shutil.copy(logo, outDir)
-        except Exception as e:
-            logging.warn(" Error while copying logo file %s" % e)
-            pass
-    else:  # use default one set in template
-        logo = 'default'
-
-    # open and parse 1st line title.md
-    try:
-        title_file = os.path.join(repoDir, 'title.md')
-        with open(title_file, 'r', encoding='utf-8') as f:
-            course_obj.title = f.read().strip()
-    except Exception as e:
-        logging.warn(" Error while parsing title file %s" % e)
-        pass
-
-    # Create site index.html with home.md content
-    # open and parse home.md
-    custom_home = False
-    try:
-        home_file = os.path.join(repoDir, 'home.md')
-        with open(home_file, 'r', encoding='utf-8') as f:
-            home_data = f.read()
-        home_html = markdown.markdown(home_data, MARKDOWN_EXT)
-        custom_home = True
-    except Exception:
-        # use default from template
-        logging.error(" Cannot parse home markdown ")
-        with open(os.path.join(TEMPLATES_PATH, 'default_home.html'),
-                  'r', encoding='utf-8') as f:
-            home_html = f.read()
-    # write index.html file
-    html = site_template.render(course=course_obj,
-                                module_content=home_html,
-                                body_class="home",
-                                logo=logo,
-                                custom_home=custom_home)
-    utils.write_file(html, os.getcwd(), outDir, 'index.html')
-
-    # Loop through modules
-    for module in course_obj.modules:
-        module_template = jenv.get_template("module.html")
-        module_html_content = module_template.render(module=module)
-        html = site_template.render(course=course_obj,
-                                    module_content=module_html_content,
-                                    body_class="modules", logo=logo)
-        utils.write_file(html, os.getcwd(), outDir, module.module+'.html')
+    return course_program
 
 
-############### main ################
+# ############## main ################
 if __name__ == "__main__":
 
     # utf8 hack, python 2 only !!
@@ -172,6 +121,9 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--destination",
                         help="Set the destination dir",
                         default='build')
+    parser.add_argument("-t", "--title",
+                        help="Title of the course program",
+                        default='Culture numérique')
     parser.add_argument("-u", "--baseUrl",
                         help="Set the base url for absolute url building",
                         default='http://culturenumerique.univ-lille3.fr')
@@ -182,6 +134,18 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--ims",
                         action='store_true',
                         help="Also generate IMS archive for each module",
+                        default=False)
+    parser.add_argument("-H", "--no-html",
+                        action='store_true',
+                        help="do not generate HTML files",
+                        default=False)
+    parser.add_argument("-G", "--no-gift",
+                        action='store_true',
+                        help="do not generate GIFT bank file",
+                        default=False)
+    parser.add_argument("-V", "--no-video",
+                        action='store_true',
+                        help="do not generate video list file",
                         default=False)
     parser.add_argument("-e", "--edx",
                         action='store_true',
@@ -213,10 +177,11 @@ if __name__ == "__main__":
     utils.prepareDestination(BASE_PATH, outDir)
 
     # ** Process repository **
-    course_obj = processRepository(args, repoDir, outDir)
+    course_program = processRepository(args, repoDir, outDir)
 
     # ** Build site **
-    buildSite(course_obj, repoDir, outDir)
+    if not args.no_html:
+        toHTML.buildSite(course_program, repoDir, outDir)
 
     # ** Exit and print path to build files: **
     os.chdir(BASE_PATH)

@@ -1,29 +1,32 @@
-import sys, os
-sys.path.insert(0, os.path.abspath('..'))
+import os
 import unittest
 import urllib2
 import requests
 import shutil
-import exceptions
-from mock import patch, Mock, MagicMock
-
-from urlparse import urlparse
-
+from mock import Mock
+import logging
+import sys
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '..'))
+from src import utils
 
 # Ignore Warning
-import logging
 logger = logging.getLogger()
 logger.setLevel(40)
 
-from src import utils
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 def connection_error():
     raise requests.exceptions.ConnectionError
 
+
 def oserror():
     raise OSError(2, 'message')
 
-osErrorMock= Mock(side_effect = OSError)
+
+osErrorMock = Mock(side_effect=OSError)
+
 
 class UtilsTestCase(unittest.TestCase):
 
@@ -135,6 +138,7 @@ class UtilsTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile('./outdir/media/Logo_cercle_vert.svg'))
         if (os.path.isfile('./outdir/media/Logo_cercle_vert.svg')):
             shutil.rmtree('./outdir')
+
 
 # Main
 if __name__ == '__main__':

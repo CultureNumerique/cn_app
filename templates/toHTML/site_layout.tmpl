@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="/static/image/png" href="img/favicon.ico" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    {% if body_class == 'home' %}<link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>{% endif %}
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/jasny-bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- onepage css -->
+    {% if body_class == 'home' %}
+    <link href="static/css/onepage.css" rel="stylesheet">
+    {% elif body_class == 'modules' %}
+    <link href="static/css/modules.css" rel="stylesheet">
+    {% endif %}
+    <!-- Icones -->
+    <link href="static/css/icons.css" rel="stylesheet">
+    <link href="static/css/common.css" rel="stylesheet">
+    <title>{{ course.title }}</title>
+</head>
+
+<body class={{ body_class }} data-spy="scroll" {% if body_class == 'home' %}data-target="#header" data-offset="120"{%elif body_class== 'modules'%}data-target="#menugauche" data-offset="120"{% endif %}>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top" id="menutop">
+        <div class="">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Activer navigation principale</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">
+                  {% if logo == 'default'%}
+                      <img class="hidden-xs logo" class="logo" src="static/img/logo_plat_vert.svg" alt="">
+                  {% else %}
+                      <img class="hidden-xs logo" class="logo" src="{{logo}}" alt="">
+                  {% endif %}
+                  <img class="visible-xs logo" src="static/img/logo_cercle_vert.svg" alt="">
+                </a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="">
+                        <a href="index.html">
+                            <img src="static/img/home.svg" style="width:1.8em; height:1.8em; padding-right:0.5em; margin-top:-0.25em;">Présentation</a>
+                    </li>
+                    <li>
+                        <a href="index.html#page7">
+                            <img src="static/img/contact.svg" style="width:2.5em; height:2.5em; padding-right:0.5em; margin-top:-0.60em; margin-bottom:-0.5em;">Contact</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="static/img/modules.svg" style="width:3.5em; height:3.5em; padding-right:0.5em; margin-top:-0.90em; margin-bottom:-10px;">Modules
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for module in course.modules %}
+                            <li class="btnmodules {{module.class}}">
+                                <a href="{{ module.name }}.html">{{module.menutitle}}</a>
+                                <!-- <p class="subbtnmodules">{{module.title}}</p> -->
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+    {{content}}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="static/js/vendors/bootstrap.min.js"></script>
+    <script src="static/js/vendors/jasny-bootstrap.min.js"></script>
+    {% if body_class == 'home' %}
+    <script src="static/js/scroll.js"></script>
+    {% else %}
+    <script src="static/js/modules.js"></script>
+    {% endif %}
+
+    
+</body>
+</html>

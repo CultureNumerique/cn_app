@@ -1,12 +1,10 @@
 all :
-	python model_test.py
-	python edx_test.py
-	python ims_test.py
-	python utils_test.py
-	python cnexport_test.py
+	python test_all.py
 
-clean : all
-	rm -r testEDX
-	rm -r testGIFT
-
+clean : 
+	rm -rf testEDX
+	rm -rf testGIFT
+	rm -rf out
+	rm -rf outTestEDX
+	rm -rf outTestIMS
 

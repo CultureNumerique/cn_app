@@ -1,0 +1,27 @@
+<!-- Début page 6 -->
+<div id="page6" class="page section-even container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<h1>Modules</h1>
+			<br>
+		</div>
+		<div class="row text-center">
+		  {% for module in course.modules %}
+		  <div class="col-md-2">
+		    <img src="{{module.logo_filename}}">
+		    <br>
+		    <strong><a href="{{module.name}}.html">{{module.menutitle}}</a></strong>
+		    <br> {{module.title}}
+		    <br>
+		    <a href="{{module.name}}.html"type="button" class="btn-even btn-even-primary btn-modules">Voir le module</a><br/>
+		    <a type="button" data-target="" href="{{module.name}}_imscc.zip" class="btn-even btn-even-primary btn-modules">Télecharger (IMSCC)</a><br/>
+		    <a type="button" data-target="" href="{{module.name}}_edx.tar.gz" class="btn-even btn-even-primary btn-modules">Télecharger (EDX)</a>
+		  </div>
+		  {% endfor %}
+		</div>
+	</div>
+
+</div>
+
+<!-- Fin page 6 -->
+

@@ -15,12 +15,12 @@ urlpatterns = [
         name='help'),
 
     # Form views
-    url(r'^form_upload/$',
-        escapad.views.form_upload,
-        name='form_upload'),
-    url(r'^form_upload_light/$',
-        escapad.views.form_upload_light,
-        name='form_upload_light'),
+    url(r'^course_from_uploaded_files/$',
+        escapad.views.course_from_uploaded_files,
+        name='course_from_uploaded_files'),
+    url(r'^course_from_uploaded_archive/$',
+        escapad.views.course_from_uploaded_archive,
+        name='course_from_uploaded_archive'),
     url(r'^reupload/$',
         escapad.views.form_reupload,
         name='form_reupload'),

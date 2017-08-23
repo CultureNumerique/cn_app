@@ -71,7 +71,8 @@ class Repository(models.Model):
     provider = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):
-        return "Repository: {0} (user: {1})".format(self.git_name, self.git_username)
+        return "Repository: {0} (user: {1})".format(self.git_name,
+                                                    self.git_username)
 
 
 class Cours(models.Model):

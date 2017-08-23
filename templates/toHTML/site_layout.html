@@ -72,25 +72,9 @@
             <!--/.nav-collapse -->
         </div>
     </nav>
-    <!-- end of fixed top navbar -->
-    {% block main_content %}
-    {% if body_class == 'home' and custom_home %}
-      <div class="custom_home">
-        {{ module_content | safe }}
-      </div>
-    {% else %}
-      {{ module_content | safe }}
-    {% endif %}
-
-    {% endblock %}
-    <!-- Début footer -->
-    <!-- <footer>
-        <a href="https://www.univ-lille3.fr/">
-            <img src="static/svg/logo_lille3.svg" title="" alt="Lille 3" />
-        </a>
-        <p><a href="http://culturenumerique.univ-lille3.fr/" title="Culture Numérique">{{ course.title }}</a> - 2015</p>
-    </footer> -->
-
+    {{content}}
+    
+      
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -101,15 +85,7 @@
     {% else %}
     <script src="static/js/modules.js"></script>
     {% endif %}
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();
-            $('.email').click(function() {
-                login = $(this).html().replace('<span class="iamnotadot"></span>', '.')
-        		window.location.href = 'mailto:' + login + '@univ-lille3.fr';
-        	});
-        });
-    </script>
 
+    
 </body>
 </html>
