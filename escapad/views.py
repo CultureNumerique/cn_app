@@ -179,7 +179,7 @@ def course_from_uploaded_files(request):
 
         response = HttpResponse(zip)
         response['Content-Type'] = 'application/octet-stream'
-        response['Content-Disposition'] = "attachment; filename=\"" + titleData + ".zip\""
+        response['Content-Disposition'] = "attachment; filename=\"" + titleCP + ".zip\""
         return response
 
     return render(request, 'courseFromFiles.html', {
